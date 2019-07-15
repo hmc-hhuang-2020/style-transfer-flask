@@ -1,0 +1,54 @@
+{% load static %}
+
+<html>
+  <head>
+    <title>About Style Transfer</title>
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+  </head>
+
+  <body>
+    <div class="topnav">
+        <!-- <a href="home">Home</a>
+        <a class="active" href="about">About Us</a> -->
+        <a href="{% url 'home' %}">Home</a>
+        <a class="active" href="{% url 'about' %}">About Us</a>
+    </div> 
+
+
+    <h1>About Style Transfer</h1>
+
+    <p>
+        Image style transfer is a subject that has been studied a lot in the past few years. 
+        However, the existing models focus on transferring the whole image to a designated style. 
+        While learning more about machine learning in AMLI, computer vision is one area that we haven’t had enough chance to explore. 
+        Style transfer is one subject that has the potential to be impactful and useful to a large audience. 
+        With current deployment of some apps, one can apply artistic filters to the photos. We want to 
+        create an web app that interactively offers more style transfer options to users.
+
+    </p>
+
+    <h2>About Style Transfer Team</h2>
+    <p>
+        <b>Huize Huang</b>
+    </p>
+
+    <p>
+        <b>Aaron Alphonsus</b>
+    </p>
+
+    <p>
+        <b>Luis Gruber</b>
+    </p>
+
+    <p>
+        <b>Michael Hu</b>
+    </p>
+
+    <p>
+        <b>Sarah Saleem</b>
+    </p>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Style Transfer</title>
+    <link rel="stylesheet" href='/static/css/home.css'>
+    </head>
+  <body>
+
+    <h1>Style Transfer</h1>
+
+    <!--Photo Buttons-->
+    <div id="photoButtonsDiv">
+      <form method="post" action="{{ url_for('submitted_form') }}">
+        <input class="input-file" id="importFile" name="file" type="file" accept="image/*">
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </body>
+</html>
+
+
