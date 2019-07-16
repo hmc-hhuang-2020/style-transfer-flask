@@ -1,20 +1,33 @@
 <html>
-  <head>
-    <title>Style Transfer</title>
-    <link rel="stylesheet" href='/static/css/home.css'>
-    </head>
-  <body>
 
-    <h1>Style Transfer</h1>
+<head>
+  <title>Style Transfer</title>
+  <link rel="stylesheet" href='/static/css/home.css'>
+</head>
 
-    <!--Photo Buttons-->
-    <div id="photoButtonsDiv">
-      <form method="post" action="{{ url_for('submitted_form') }}">
-        <input class="input-file" id="importFile" name="file" type="file" accept="image/*">
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-  </body>
+<body>
+  <div class="topnav">
+    <a class="active" href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('about') }}">About Us</a>
+  </div>
+  <h1>Style Transfer</h1>
+
+  <!--Photo Buttons-->
+  <div id="photoButtonsDiv">
+    <!-- <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data"> -->
+    <!-- <form action="{{ uploadUri }}" method="POST" enctype="multipart/form-data"> -->
+    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+      <div class="styleImageClass">
+        <p>Style Image: </p>
+        <input class="input-file" name="style_file" type="file" accept="image/*">
+      </div>
+      <div class="styleImageClass">
+        <p>Input Image: </p>
+        <input class="input-file" name="image_file" type="file" accept="image/*">
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</body>
+
 </html>
-
-
