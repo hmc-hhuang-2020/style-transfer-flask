@@ -1,0 +1,23 @@
+<html>
+
+<head>
+    <title>Style Transfer</title>
+    <link rel="stylesheet" href='/static/css/home.css'>
+</head>
+
+<body>
+    <div class="topnav">
+        <a class="active" href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('about') }}">About Us</a>
+    </div>
+    <h1>Style Transfer</h1>
+    <form method="POST" action="{{ url_for('select') }}" enctype="multipart/form-data">
+        <div class="objectClass">
+            <p> Enter the object you want to choose:</p>
+            <input type="text" name="chosen_objects"><br>
+            <p></p>
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+</html>

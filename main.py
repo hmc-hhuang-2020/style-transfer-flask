@@ -6,7 +6,7 @@ from flask import (Flask, flash, make_response, redirect, render_template,
 from google.cloud import storage
 from style_transfer import run_style_transfer
 from PIL import Image
-from object_detection import load_object
+# from object_detection import load_object
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -28,6 +28,38 @@ def index():
 def about():
     return render_template('about.html')
 
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    transfer_option = request.form.get('transfer_select')
+    if transfer_option == 'whole':
+        style_path = request.files['style_file']
+        content_path = request.files['image_file']
+        best, best_loss = run_style_transfer(
+            content_path, style_path, num_iterations=2)
+        im = Image.fromarray(best)
+        im.save('static/out/styled.jpg')
+        styled_file = os.path.join(
+            os.path.abspath(''), 'static/out/styled.jpg')
+        # show_objects = load_object(image_file, model)
+        # contour_outlines = show_selection(raw_input, filename, show_objects)
+        storage_client = storage.Client(project='amli-245518')
+        bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
+        destination_blob_name = 'styled.jpg'
+        blob = bucket.blob(destination_blob_name)
+        blob.upload_from_filename(styled_file)
+        url = blob.public_url
+        print(url)
+        return render_template('upload.html', image_url=url)
+    elif transfer_option == 'object':
+        return render_template('object.html')
+
+
+@app.route("/select", methods=['POST'])
+def select():
+    selection = request.form.get('chosen_objects')
+    print(selection)
+    return render_template('crop.html')
 
 # @app.route("/upload")
 # def upload():
@@ -52,29 +84,6 @@ def about():
 #     response = make_response(blob_info.open().read())
 #     response.headers['Content-Type'] = blob_info.content_type
 #     return response
-
-
-@app.route('/upload', methods=['POST'])
-def upload():
-    # style_path = request.files['style_file']
-    # content_path = request.files['image_file']
-    # best, best_loss = run_style_transfer(
-    #     content_path, style_path, num_iterations=500)
-    # Image.fromarray(best)
-    # im = Image.fromarray(best)
-    # styled = im.save('styled.jpg')
-    image_file = request.files['image_file']
-    model = os.path.join(os.path.abspath(''), 'rcnn_model.pkl')
-    show_objects = load_object(image_file, model)
-    # contour_outlines = show_selection(raw_input, filename, show_objects)
-    storage_client = storage.Client(project='amli-245518')
-    bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
-    destination_blob_name = 'test.jpg'
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename(style_file.filename)
-    print("Send file")
-
-    return render_template('upload.html')
 
 
 # @app.route('/uploaded', methods=['GET'])

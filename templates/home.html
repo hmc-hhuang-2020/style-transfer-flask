@@ -25,7 +25,19 @@
         <p>Input Image: </p>
         <input class="input-file" name="image_file" type="file" accept="image/*">
       </div>
-      <button type="submit">Submit</button>
+      <div class="styleImageClass">
+        <p>Transfer Options: </p>
+        <select name="transfer_select">
+          <option value="">--Please choose an option--</option>
+          <option value="whole">Whole Image</option>
+          <option value="object">Detected Objects</option>
+          <option value="inverse">Inverse Detected Objects</option>
+        </select>
+      </div>
+      <div class="inputImageClass">
+        <p></p>
+        <button type="submit">Submit</button>
+      </div>
     </form>
   </div>
 </body>
