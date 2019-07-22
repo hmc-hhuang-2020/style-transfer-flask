@@ -1,0 +1,15 @@
+# Byte-compiled python files
+__pycache__/
+
+# JSON key file
+AMLI-8d5ee15d9927.json
+
+# VSCode files
+.vscode/
+
+# Virtual environment
+venv/
+
+# Local environment files
+coco/
+static/out/
