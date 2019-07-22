@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import time
 from flask import (Flask, flash, make_response, redirect, render_template,
                    request, send_file, session, url_for)
@@ -7,6 +8,9 @@ from google.cloud import storage
 from style_transfer import run_style_transfer
 from PIL import Image
 from object_detection import load_object
+from object_detection import InferenceConfig
+
+import mrcnn.model as modellib
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -29,31 +33,6 @@ def about():
     return render_template('about.html')
 
 
-# @app.route("/upload")
-# def upload():
-#     uploadUri = blobstore.create_upload_url(
-#         '/submit', gs_bucket_name=CLOUD_STORAGE_BUCKET)
-#     return render_template('upload.html', uploadUri=uploadUri)
-
-
-# @app.route("/submit", methods=['POST'])
-# def submit():
-#     if request.method == 'POST':
-#         f = request.files['style_file']
-#         header = f.headers['Content-Type']
-#         parsed_header = parse_options_header(header)
-#         blob_key = parsed_header[1]['blob-key']
-#     return blob_key
-
-
-# @app.route("/img/<bkey>")
-# def img(bkey):
-#     blob_info = blobstore.get(bkey)
-#     response = make_response(blob_info.open().read())
-#     response.headers['Content-Type'] = blob_info.content_type
-#     return response
-
-
 @app.route('/upload', methods=['POST'])
 def upload():
     # style_path = request.files['style_file']
@@ -64,15 +43,36 @@ def upload():
     # im = Image.fromarray(best)
     # styled = im.save('styled.jpg')
     image_file = request.files['image_file']
-    model = os.path.join(os.path.abspath(''), 'rcnn_model.pkl')
-    show_objects = load_object(image_file, model)
+
+    print(image_file)    
+
+    # model = os.path.join(os.path.abspath(''), 'rcnn_model.pkl')
+    # show_objects = load_object(image_file, model)
     # contour_outlines = show_selection(raw_input, filename, show_objects)
-    storage_client = storage.Client(project='amli-245518')
-    bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
-    destination_blob_name = 'test.jpg'
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename(style_file.filename)
-    print("Send file")
+
+    # To find local version
+    ROOT_DIR = os.path.abspath("../")
+    MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
+    # sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
+    
+    # sys.path.append(MaskRCNN_DIR)  # To find local version of the library
+    MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
+    COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+
+    config = InferenceConfig()
+
+    detection_model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
+    detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
+    
+    
+    load_object(image_file, detection_model)
+
+    # storage_client = storage.Client(project='amli-245518')
+    # bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
+    # destination_blob_name = 'test.jpg'
+    # blob = bucket.blob(destination_blob_name)
+    # blob.upload_from_filename(style_file.filename)
+    # print("Send file")
 
     return render_template('upload.html')
 

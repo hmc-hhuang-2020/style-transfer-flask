@@ -1,9 +1,19 @@
+import os
+import sys
+
+# To find local version
+ROOT_DIR = os.path.abspath("../")
+MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
+sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
+
+sys.path.append(MaskRCNN_DIR)  # To find local version of the library
+MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+
 from mrcnn import visualize
 import mrcnn.model as modellib
 from mrcnn import utils
-from samples.coco import coco as coco
-import os
-import sys
+# from samples.coco import coco as coco
 import random
 import math
 import numpy as np
@@ -18,17 +28,15 @@ from skimage.measure import find_contours
 from skimage import measure
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
-import model
+# from mrcnn import model
 from PIL import Image
 
-# To find local version
-sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
-ROOT_DIR = os.path.abspath("../")
-MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
+import coco
 
-sys.path.append(MaskRCNN_DIR)  # To find local version of the library
-MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+import tensorflow as tf
+
+
+tf.disable_eager_execution()
 
 
 class InferenceConfig(coco.CocoConfig):
@@ -38,10 +46,10 @@ class InferenceConfig(coco.CocoConfig):
     IMAGES_PER_GPU = 1
 
 
-config = InferenceConfig()
+# config = InferenceConfig()
 
-model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
-model.load_weights(COCO_MODEL_PATH, by_name=True)
+# model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
+# model.load_weights(COCO_MODEL_PATH, by_name=True)
 
 
 class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
@@ -79,15 +87,38 @@ def apply_mask(image, mask, color, alpha=0.5):
     return image
 
 
+def load_img(path_to_img):
+    max_dim = 256
+    
+    img = skimage.io.imread(path_to_img)
+    # print(img)
+    
+    
+    long = max(img.shape)
+    scale = max_dim/long
+    # img = skimage.transform.resize(
+    #     img, (round(img.shape[0]*scale), round(img.shape[1]*scale)))
+
+    # img = kp_image.img_to_array(img)
+
+    # We need to broadcast the image array such that it has a batch dimension
+    # img = np.expand_dims(img, axis=0)
+    return img
+
+
 def load_object(file_name, model):
-    model = modellib.MaskRCNN(
-        mode="inference", model_dir=MODEL_DIR, config=config)
-    image = skimage.io.imread(file_name)
-    model = os.path.dirname
+    # model = modellib.MaskRCNN(
+    #     mode="inference", model_dir=MODEL_DIR, config=config)
+    image = load_img(file_name)
+
+    # print(image)
+
+    # model = os.path.dirname
     results = model.detect([image], verbose=1)
     r = results[0]
     # visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
     #                             class_names, r['scores'])
+
     N = len(r['rois'])
     colors = random_colors(N)
     figsize = (16, 16)
@@ -99,43 +130,62 @@ def load_object(file_name, model):
     color = (.2, 0.5, 0.9)
     captions = None
     masked_image = image.astype(np.uint32).copy()
+    
+    # print("Before:")
+    # print(masked_image)
+    
     counts = {}
     output = []
     for i in range(N):
         y1, x1, y2, x2 = r['rois'][i]
-    if not captions:
-        caption = class_names[r['class_ids'][i]]
-        if caption not in counts:
-            counts[caption] = 1
-            caption = caption+str(counts[caption])
+        if not captions:
+            caption = class_names[r['class_ids'][i]]
+            if caption not in counts:
+                counts[caption] = 1
+                caption = caption+str(counts[caption])
+            else:
+                counts[caption] += 1
+                caption = caption+str(counts[caption])
         else:
-            counts[caption] += 1
-            caption = caption+str(counts[caption])
-    else:
-        caption = captions[i]
-    ax.text(x1, y1 + 8, caption,
-            color='w', size=11, backgroundcolor="none")
-    output.append(caption)
+            caption = captions[i]
+        ax.text(x1, y1 + 8, caption,
+                color='w', size=11, backgroundcolor="none")
+        output.append(caption)
 
-    mask = r['masks'][:, :, i]
-    masked_image = apply_mask(masked_image, mask, color)
+        mask = r['masks'][:, :, i]
+        masked_image = apply_mask(masked_image, mask, colors[i])
 
-    padded_mask = np.zeros(
-        (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
-    padded_mask[1:-1, 1:-1] = mask
-    contours = find_contours(padded_mask, 0.5)
-    for verts in contours:
-        verts = np.fliplr(verts) - 1
-        p = Polygon(verts, facecolor="none", edgecolor=color)
-        ax.add_patch(p)
+        padded_mask = np.zeros(
+            (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
+        padded_mask[1:-1, 1:-1] = mask
+        contours = find_contours(padded_mask, 0.5)
+        for verts in contours:
+            verts = np.fliplr(verts) - 1
+            p = Polygon(verts, facecolor="none", edgecolor=color)
+            ax.add_patch(p)
 
-    # fig = ax.imshow(masked_image.astype(np.uint8))
-    # fig.axes.get_xaxis().set_visible(False)
-    # fig.axes.get_yaxis().set_visible(False)
-    ax.axes.get_xaxis().set_visible(False)
-    ax.axes.get_yaxis().set_visible(False)
-    all = plt.savefig('show.jpg', bbox_inches='tight',
-                      pad_inches=0)
+    # print("After:")
+    # print(masked_image)
+
+    fig = ax.imshow(masked_image.astype(np.uint8))
+    fig.axes.get_xaxis().set_visible(False)
+    fig.axes.get_yaxis().set_visible(False)
+    plt.savefig('/./mnt/c/Users/Aaron/Downloads/savefig.jpg', bbox_inches = 'tight', pad_inches = 0)
+
+    # ax.axes.get_xaxis().set_visible(False)
+    # ax.axes.get_yaxis().set_visible(False)
+    # ax.imshow(masked_image.astype(np.uint8))
+    
+    # im = Image.fromarray(masked_image)
+    # plt.imsave('/./mnt/c/Users/Aaron/Downloads/test1.jpg', masked_image)
+    
+    # print(image)
+    # skimage.io.imsave('/./mnt/c/Users/Aaron/Downloads/output.jpg', masked_image)
+
+    # all = plt.savefig('show.jpg', bbox_inches='tight',
+    #                   pad_inches=0)
+
+    print(output)
     return r, all
 
 
