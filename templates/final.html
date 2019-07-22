@@ -11,10 +11,14 @@
         <a href="{{ url_for('about') }}">About Us</a>
     </div>
     <h1>Style Transfer</h1>
-    <p>Transfer Success</p>
-    <div class="styleImageClass">
-        <p>Test</p>
+    <div class="objectClass">
+        <p> Take a look at the final product:</p>
         <img src="{{image_url}}" width="auto" height="auto">
+        <p></p>
+        <form method="POST" action="{{ url_for('download') }}" enctype="multipart/form-data">
+            <button type="submit">Download</button>
+        </form>
     </div>
+
 
 </html>

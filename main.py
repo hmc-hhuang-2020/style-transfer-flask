@@ -4,15 +4,92 @@ import time
 from flask import (Flask, flash, make_response, redirect, render_template,
                    request, send_file, session, url_for)
 from google.cloud import storage
+# from google.appengine.api import app_identity
+import cloudstorage
+
+import cloudstorage as gcs
+# from google.appengine.api import app_identity
 from style_transfer import run_style_transfer
 from PIL import Image
-# from object_detection import load_object
+from object_detection import load_object, show_selection, InferenceConfig
+import mrcnn.model as modellib
+from mrcnn import utils
+# from werkzeug.utils import secure_filename
+import numpy as np
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
 
 CLOUD_STORAGE_BUCKET = 'style-input-images-1'
+
+RESULTS = None
+
+SHOW_OBJECTS = None
+
+STYLE_URL = None
+
+DETECT_URL = None
+
+FINAL_URL = None
+
+# ROOT_DIR = os.path.abspath("")
+# print(ROOT_DIR)
+# MODEL_DIR = ROOT_DIR
+# print(print)
+# COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+# # print(COCO_MODEL_PATH)
+# # Download COCO trained weights from Releases if needed
+# if not os.path.exists(COCO_MODEL_PATH):
+#     utils.download_trained_weights(COCO_MODEL_PATH)
+
+# config = InferenceConfig()
+# DETECTION_MODEL = modellib.MaskRCNN(
+#     mode="inference", model_dir=MODEL_DIR, config=config)
+# print("Successfully created the model")
+# print(DETECTION_MODEL)
+# DETECTION_MODEL.load_weights(COCO_MODEL_PATH, by_name=True)
+# DETECTION_MODEL.keras_model._make_predict_function()
+# print("Successfully loaded the model")
+
+
+def image_to_array(image):
+    # Restricts to RGB
+    im_array = np.array(image)[:, :, :3]
+
+    if np.max(im_array) <= 1.0:
+        im_array = np.floor(im_array * 255).astype(np.uint8)
+
+    return im_array
+
+
+def upload_to_gcloud(file):
+    # style_path = request.files['style_file']
+    storage_client = storage.Client(project='amli-245518')
+    bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
+    blob = bucket.blob(file.filename)
+    blob.upload_from_file(file)
+    return blob.public_url
+
+
+def upload_to_gcloud_name(file, destination_blob_name):
+    # style_path = request.files['style_file']
+    storage_client = storage.Client(project='amli-245518')
+    bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(file)
+    return blob.public_url
+
+
+def download_from_gcloud(filename):
+    # style_file = os.path.abspath('../Flask-STWA/stylize.jpg')
+    client = storage.Client()
+    bucket = client.get_bucket(CLOUD_STORAGE_BUCKET)
+    blob = bucket.blob(filename)
+    temp = 'static/out/'+filename
+    blob.download_to_filename(temp)
+    # return send_file(temp.name, attachment_filename=style_file)
+    return temp
 
 
 def allowed_file(filename):
@@ -29,37 +106,128 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/crop')
+def crop():
+    return render_template('crop.html')
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     transfer_option = request.form.get('transfer_select')
     if transfer_option == 'whole':
         style_path = request.files['style_file']
+        # STYLE_URL = upload_to_gcloud(style_path)
         content_path = request.files['image_file']
         best, best_loss = run_style_transfer(
-            content_path, style_path, num_iterations=2)
+            content_path, style_path, num_iterations=1)
         im = Image.fromarray(best)
         im.save('static/out/styled.jpg')
         styled_file = os.path.join(
             os.path.abspath(''), 'static/out/styled.jpg')
-        # show_objects = load_object(image_file, model)
-        # contour_outlines = show_selection(raw_input, filename, show_objects)
-        storage_client = storage.Client(project='amli-245518')
-        bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
-        destination_blob_name = 'styled.jpg'
-        blob = bucket.blob(destination_blob_name)
-        blob.upload_from_filename(styled_file)
-        url = blob.public_url
-        print(url)
+        url = upload_to_gcloud_name(styled_file, 'styled_image.jpg')
         return render_template('upload.html', image_url=url)
     elif transfer_option == 'object':
-        return render_template('object.html')
+        # # Upload style image first
+        # style_path = request.files['style_file']
+        # STYLE_URL = upload_to_gcloud(style_path)
+        # url = STYLE_URL
+        # storage_client = storage.Client(project='amli-245518')
+        # bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
+        # destination_blob_name = 'style.jpg'
+        # blob = bucket.blob(destination_blob_name)
+        # blob.upload_from_file(style_path)
+        content_path = request.files['image_file']
+        # content = request.files['image_file']
+        # image = Image.open(content.stream)
+        # content_path = image_to_array(image)
+        # Process Object Detection and return image and labels detected
+        ROOT_DIR = os.path.abspath("")
+        print(ROOT_DIR)
+        MODEL_DIR = ROOT_DIR
+        print(print)
+        COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+        print(COCO_MODEL_PATH)
+
+        # ROOT_DIR = os.path.abspath("../")
+        # MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
+        # MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
+        # COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+
+        config = InferenceConfig()
+
+        detection_model = modellib.MaskRCNN(
+            mode="inference", model_dir=MODEL_DIR, config=config)
+        print("Successfully created the model")
+        print(detection_model)
+        detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
+        print("Successfully loaded the model")
+
+        RESULTS, SHOW_OBJECTS = load_object(content_path, detection_model)
+        # load_object(image_file, detection_model)
+
+        # config = InferenceConfig()
+
+        # model = modellib.MaskRCNN(
+        #     mode="inference", model_dir=MODEL_DIR, config=config)
+        # model.load_weights(COCO_MODEL_PATH, by_name=True)
+
+        # results, show_objects = load_object(image_file)
+        # RESULTS = results
+        # SHOW_OBJECTS = show_objects
+
+        # contour_outlines = show_selection(raw_input, filename, show_objects)
+        url = upload_to_gcloud_name(SHOW_OBJECTS, 'all_objects.jpg')
+        return render_template('object.html', image_url=url)
 
 
 @app.route("/select", methods=['POST'])
 def select():
     selection = request.form.get('chosen_objects')
-    print(selection)
-    return render_template('crop.html')
+    selection = [int(x) for x in " ".join(selection.split(",")).split()]
+
+    contour_outlines = show_selection(selection, SHOW_OBJECTS, RESULTS)
+
+    DETECT_URL = upload_to_gcloud_name(
+        contour_outlines, 'selected_objects.jpg')
+    return render_template('crop.html', image_url=DETECT_URL)
+
+
+@app.route("/transform", methods=['POST'])
+def transform():
+    # STYLE_URL = "/style-input-images-1/Vassily_Kandinsky,_1913_-_Composition_7.jpg"
+    # gcs_file = storage.open(STYLE_URL)
+    # style_path = gcs_file.read()
+    # gcs_file.close()
+    # DETECT_URL = "/style-input-images-1/styled_image.jpg"
+    # gcs_file = storage.open(DETECT_URL)
+    # content_path = gcs_file.read()
+    # gcs_file.close()
+    style_path = download_from_gcloud("style.jpg")
+    content_path = download_from_gcloud("selected_objects.jpg")
+    # best, best_loss = run_style_transfer(
+    #     DETECT_URL, STYLE_URL, num_iterations=1)
+
+    best, best_loss = run_style_transfer(
+        content_path, style_path, num_iterations=1)
+    im = Image.fromarray(best)
+    im.save('static/out/styled_final.jpg')
+    styled_file = os.path.join(
+        os.path.abspath(''), 'static/out/styled_final.jpg')
+
+    url = upload_to_gcloud_name(styled_file, 'styled_final.jpg')
+    return render_template('final.html', image_url=url)
+
+
+@app.route("/download", methods=['GET'])
+def download():
+    final_url = download_from_gcloud("styled_final.jpg")
+    # final = 'styled_final.jpg'
+    # client = storage.Client()
+    # bucket = client.get_bucket(CLOUD_STORAGE_BUCKET)
+    # blob = bucket.blob(final)
+    # filename = 'final.jpg'
+    # blob.download_to_filename(filename)
+    return render_template('home.html')
 
 # @app.route("/upload")
 # def upload():
@@ -91,7 +259,7 @@ def select():
 #     return render_template('upload.html')
 
 #     style_file = request.files['style_file']
-#     blob.upload_from_filename(style_file)
+#     blob.upload_from_file(style_file)
 
 #     style_file = request.files['style_file']
 #     image_file = request.files['image_file']

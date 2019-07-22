@@ -12,7 +12,11 @@
     </div>
     <h1>Style Transfer</h1>
     <div class="styleImageClass">
-        <p> Input Success</p>
+        <img src="{{image_url}}" width="auto" height="auto">
+        <p> Selection Success, Submit to Transfer</p>
+        <form method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data">
+            <button type="submit">Submit</button>
+        </form>
     </div>
 
 

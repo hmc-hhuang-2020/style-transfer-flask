@@ -13,6 +13,7 @@
     <h1>Style Transfer</h1>
     <form method="POST" action="{{ url_for('select') }}" enctype="multipart/form-data">
         <div class="objectClass">
+            <img src="{{image_url}}" width="auto" height="auto">
             <p> Enter the object you want to choose:</p>
             <input type="text" name="chosen_objects"><br>
             <p></p>
