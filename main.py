@@ -35,6 +35,7 @@ def about():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+<<<<<<< HEAD
     # style_path = request.files['style_file']
     # content_path = request.files['image_file']
     # best, best_loss = run_style_transfer(

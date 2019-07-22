@@ -43,6 +43,14 @@ h1 {
   color: white;
 }
 
+.objectClass{
+  width: 200px;
+  height: 100px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0 auto 0;
+  right: 20%;
+}
 
 .styleImageClass{
   width: 200px;
@@ -62,6 +70,14 @@ h1 {
   right: 50%;
 }
 
+.buttonClass{
+  width: 200px;
+  height: 100px;
+  top: 50;
+  bottom: 50;
+  margin: auto 5% auto 30%;
+  right: 50%;
+}
 
 /* Body */
 #photoButtonsDiv {

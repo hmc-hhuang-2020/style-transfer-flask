@@ -241,7 +241,8 @@ def run_style_transfer(content_path,
     init_image = load_and_process_img_crop(content_path)
     init_image = tfe.Variable(init_image, dtype=tf.float32)
     # Create our optimizer
-    opt = tf.train.AdamOptimizer(learning_rate=5, beta1=0.99, epsilon=1e-1)
+    opt = tf.compat.v1.train.AdamOptimizer(
+        learning_rate=5, beta1=0.99, epsilon=1e-1)
 
     # For displaying intermediate images
     iter_count = 1
@@ -272,6 +273,7 @@ def run_style_transfer(content_path,
 
     imgs = []
     for i in range(num_iterations):
+        print('Iteration: {}'.format(i))
         grads, all_loss = compute_grads(cfg)
         loss, style_score, content_score = all_loss
         opt.apply_gradients([(grads, init_image)])
@@ -285,6 +287,7 @@ def run_style_transfer(content_path,
             best_img = deprocess_img(init_image.numpy())
 
         # if i % display_interval == 0:
+            print('Iteration: {}'.format(i))
         #     start_time = time.time()
 
         #     # Use the .numpy() method to get the concrete numpy array

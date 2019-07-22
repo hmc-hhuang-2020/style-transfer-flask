@@ -42,3 +42,31 @@ h1 {
   background-color: steelblue;
   color: white;
 }
+
+
+.styleImageClass{
+  width: 200px;
+  height: 100px;
+  top: 0;
+  bottom: 0;
+  margin: auto 5% auto 30%;
+  right: 50%;
+}
+
+.inputImageClass{
+  width: 200px;
+  height: 100px;
+  top: 50;
+  bottom: 50;
+  margin: auto 5% auto 30%;
+  right: 50%;
+}
+
+.buttonClass{
+  width: 200px;
+  height: 100px;
+  top: 50;
+  bottom: 50;
+  margin: auto 5% auto 30%;
+  right: 50%;
+}
