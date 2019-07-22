@@ -19,7 +19,7 @@ mpl.rcParams['axes.grid'] = False
 
 
 tf.enable_eager_execution()
-print("Eager execution: {}".format(tf.executing_eagerly()))
+print("~~~~~~~~~~~\n\nEager execution: {} \n\n~~~~~~~~~".format(tf.executing_eagerly()))
 
 
 def load_img(path_to_img):

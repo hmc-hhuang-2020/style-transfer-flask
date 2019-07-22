@@ -1,21 +1,3 @@
-import tensorflow as tf
-import coco
-from PIL import Image
-from matplotlib.patches import Polygon
-from matplotlib import patches,  lines
-from skimage import measure
-from skimage.measure import find_contours
-import colorsys
-import itertools
-import matplotlib.pyplot as plt
-import matplotlib
-import skimage.io
-import numpy as np
-import math
-import random
-from mrcnn import utils
-import mrcnn.model as modellib
-from mrcnn import visualize
 import os
 import sys
 
@@ -28,11 +10,30 @@ sys.path.append(MaskRCNN_DIR)  # To find local version of the library
 MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
+from mrcnn import visualize
+import mrcnn.model as modellib
+from mrcnn import utils
 # from samples.coco import coco as coco
+import random
+import math
+import numpy as np
+import skimage.io
+import matplotlib
+import matplotlib.pyplot as plt
 
+import itertools
+import colorsys
 
+from skimage.measure import find_contours
+from skimage import measure
+from matplotlib import patches,  lines
+from matplotlib.patches import Polygon
 # from mrcnn import model
+from PIL import Image
 
+import coco
+
+import tensorflow as tf
 
 tf.disable_eager_execution()
 
@@ -89,7 +90,6 @@ def load_img(path_to_img):
     max_dim = 256
 
     img = skimage.io.imread(path_to_img)
-    # print(img)
 
     long = max(img.shape)
     scale = max_dim/long
@@ -108,8 +108,6 @@ def load_object(file_name, model):
     #     mode="inference", model_dir=MODEL_DIR, config=config)
     image = load_img(file_name)
 
-    # print(image)
-
     # model = os.path.dirname
     results = model.detect([image], verbose=1)
     r = results[0]
@@ -127,9 +125,6 @@ def load_object(file_name, model):
     color = (.2, 0.5, 0.9)
     captions = None
     masked_image = image.astype(np.uint32).copy()
-
-    # print("Before:")
-    # print(masked_image)
 
     counts = {}
     output = []
@@ -161,9 +156,6 @@ def load_object(file_name, model):
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
 
-    # print("After:")
-    # print(masked_image)
-
     fig = ax.imshow(masked_image.astype(np.uint8))
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
@@ -177,7 +169,6 @@ def load_object(file_name, model):
     # im = Image.fromarray(masked_image)
     # plt.imsave('/./mnt/c/Users/Aaron/Downloads/test1.jpg', masked_image)
 
-    # print(image)
     # skimage.io.imsave('/./mnt/c/Users/Aaron/Downloads/output.jpg', masked_image)
 
     # all = plt.savefig('show.jpg', bbox_inches='tight',
@@ -199,8 +190,8 @@ def apply_mask_image(bg, image, mask,):
 def show_selection(raw_input, image, r):
     image = skimage.io.imread(image)
     # image = skimage.io.imread(os.path.join(IMAGE_DIR, file_name))
-    # figsize = (16, 16)
-    # _, ax = plt.subplots(1, figsize=figsize)
+    figsize = (16, 16)
+    _, ax = plt.subplots(1, figsize=figsize)
 
     height, width = image.shape[:2]
     color = (.2, 0.5, 0.9)

@@ -5,7 +5,7 @@ import time
 from flask import (Flask, flash, make_response, redirect, render_template,
                    request, send_file, session, url_for)
 from google.cloud import storage
-from style_transfer import run_style_transfer
+# from style_transfer import run_style_transfer
 from PIL import Image
 from object_detection import load_object, show_selection, InferenceConfig
 import mrcnn.model as modellib
@@ -25,6 +25,10 @@ STYLE_URL = None
 DETECT_URL = None
 
 FINAL_URL = None
+
+content_copy = None
+
+CONTENT_URL = None
 
 
 def image_to_array(image):
@@ -85,15 +89,15 @@ def upload():
     transfer_option = request.form.get('transfer_select')
     if transfer_option == 'whole':
         style_path = request.files['style_file']
-        # STYLE_URL = upload_to_gcloud(style_path)
-        content_path = request.files['image_file']
-        best, best_loss = run_style_transfer(
-            content_path, style_path, num_iterations=1)
-        im = Image.fromarray(best)
-        im.save('static/out/styled.jpg')
-        styled_file = os.path.join(
-            os.path.abspath(''), 'static/out/styled.jpg')
-        url = upload_to_gcloud_name(styled_file, 'styled_image.jpg')
+        url = upload_to_gcloud(style_path)
+        # content_path = request.files['image_file']
+        # best, best_loss = run_style_transfer(
+        #     content_path, style_path, num_iterations=1)
+        # im = Image.fromarray(best)
+        # im.save('static/out/styled.jpg')
+        # styled_file = os.path.join(
+        #     os.path.abspath(''), 'static/out/styled.jpg')
+        # url = upload_to_gcloud_name(styled_file, 'styled_image.jpg')
         return render_template('upload.html', image_url=url)
     elif transfer_option == 'object':
         # # Upload style image first
@@ -106,8 +110,16 @@ def upload():
         # blob = bucket.blob(destination_blob_name)
         # blob.upload_from_file(style_path)
         content_path = request.files['image_file']
+        content_path_copy = content_path
+        print(content_path_copy)
+
         ROOT_DIR = os.path.abspath("../")
         MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
+
+        global CONTENT_URL
+        CONTENT_URL = upload_to_gcloud(content_path_copy)
+
+
         # sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
 
         # sys.path.append(MaskRCNN_DIR)  # To find local version of the library
@@ -120,9 +132,12 @@ def upload():
             mode="inference", model_dir=MODEL_DIR, config=config)
         detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
 
-        RESULTS, SHOW_OBJECTS = load_object(content_path, detection_model)
+        global RESULTS
+        global SHOW_OBJECTS
+        content = download_from_gcloud('maskrcnn_test.jpg')
+        RESULTS, SHOW_OBJECTS = load_object(content, detection_model)
         # load_object(image_file, detection_model)
-
+        
         # config = InferenceConfig()
 
         # model = modellib.MaskRCNN(
@@ -143,7 +158,16 @@ def select():
     selection = request.form.get('chosen_objects')
     selection = [int(x) for x in " ".join(selection.split(",")).split()]
 
-    contour_outlines = show_selection(selection, SHOW_OBJECTS, RESULTS)
+    # content = download_from_gcloud("maskrcnn_test.jpg")
+    # content_path = '/./mnt/c/Aaron/Documents/Career/GoogleAMLI/Data/Image'
+    content_path = download_from_gcloud('maskrcnn_test.jpg')
+    
+    print(SHOW_OBJECTS)
+    print(RESULTS)
+    # image = download_from_gcloud('all_objects.jpg')
+
+    contour_outlines = show_selection(selection, content_path, RESULTS)
+    # contour_outlines = show_selection(selection, image, RESULTS)
 
     DETECT_URL = upload_to_gcloud_name(
         contour_outlines, 'selected_objects.jpg')
@@ -165,6 +189,7 @@ def transform():
     # best, best_loss = run_style_transfer(
     #     DETECT_URL, STYLE_URL, num_iterations=1)
 
+    from style_transfer import run_style_transfer
     best, best_loss = run_style_transfer(
         content_path, style_path, num_iterations=1)
     im = Image.fromarray(best)
@@ -190,7 +215,6 @@ def download():
 
 # @app.route('/upload', methods=['POST'])
 # def upload():
-# <<<<<<< HEAD
 #     # style_path = request.files['style_file']
 #     # content_path = request.files['image_file']
 #     # best, best_loss = run_style_transfer(
