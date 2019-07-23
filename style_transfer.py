@@ -18,8 +18,9 @@ mpl.rcParams['figure.figsize'] = (10, 10)
 mpl.rcParams['axes.grid'] = False
 
 
-tf.enable_eager_execution()
-print("~~~~~~~~~~~\n\nEager execution: {} \n\n~~~~~~~~~".format(tf.executing_eagerly()))
+# tf.enable_eager_execution()
+# print("~~~~~~~~~~~\n\nEager execution: {} \n\n~~~~~~~~~".format(
+#     tf.executing_eagerly()))
 
 
 def load_img(path_to_img):
@@ -227,6 +228,7 @@ def run_style_transfer(content_path,
                        style_weight=1e-2):
     # We don't need to (or want to) train any layers of our model, so we set their
     # trainable to false.
+    tf.enable_eager_execution()
     model = get_model()
     for layer in model.layers:
         layer.trainable = False

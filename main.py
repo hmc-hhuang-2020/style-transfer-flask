@@ -1,3 +1,4 @@
+import mrcnn.model as modellib
 import logging
 import os
 import sys
@@ -7,8 +8,8 @@ from flask import (Flask, flash, make_response, redirect, render_template,
 from google.cloud import storage
 # from style_transfer import run_style_transfer
 from PIL import Image
-from object_detection import load_object, show_selection, InferenceConfig
-import mrcnn.model as modellib
+from object_detection import load_object, show_selection_outlines,
+show_selection_crop, show_selection_inverse, InferenceConfig
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -89,20 +90,20 @@ def upload():
     transfer_option = request.form.get('transfer_select')
     if transfer_option == 'whole':
         style_path = request.files['style_file']
-        url = upload_to_gcloud(style_path)
-        # content_path = request.files['image_file']
-        # best, best_loss = run_style_transfer(
-        #     content_path, style_path, num_iterations=1)
-        # im = Image.fromarray(best)
-        # im.save('static/out/styled.jpg')
-        # styled_file = os.path.join(
-        #     os.path.abspath(''), 'static/out/styled.jpg')
-        # url = upload_to_gcloud_name(styled_file, 'styled_image.jpg')
+        # url = upload_to_gcloud(style_path)
+        content_path = request.files['image_file']
+        best, best_loss = run_style_transfer(
+            content_path, style_path, num_iterations=1)
+        im = Image.fromarray(best)
+        im.save('static/out/styled.jpg')
+        styled_file = os.path.join(
+            os.path.abspath(''), 'static/out/styled.jpg')
+        url = upload_to_gcloud_name(styled_file, 'styled_image.jpg')
         return render_template('upload.html', image_url=url)
     elif transfer_option == 'object':
         # # Upload style image first
-        style_path = request.files['style_file']
-        STYLE_URL = upload_to_gcloud(style_path)
+        # style_path = request.files['style_file']
+        # STYLE_URL = upload_to_gcloud(style_path)
         # url = STYLE_URL
         # storage_client = storage.Client(project='amli-245518')
         # bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
@@ -118,7 +119,6 @@ def upload():
 
         global CONTENT_URL
         CONTENT_URL = upload_to_gcloud(content_path_copy)
-
 
         # sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
 
@@ -137,7 +137,7 @@ def upload():
         content = download_from_gcloud('maskrcnn_test.jpg')
         RESULTS, SHOW_OBJECTS = load_object(content, detection_model)
         # load_object(image_file, detection_model)
-        
+
         # config = InferenceConfig()
 
         # model = modellib.MaskRCNN(
@@ -161,16 +161,17 @@ def select():
     # content = download_from_gcloud("maskrcnn_test.jpg")
     # content_path = '/./mnt/c/Aaron/Documents/Career/GoogleAMLI/Data/Image'
     content_path = download_from_gcloud('maskrcnn_test.jpg')
-    
+
     print(SHOW_OBJECTS)
     print(RESULTS)
     # image = download_from_gcloud('all_objects.jpg')
 
     contour_outlines = show_selection(selection, content_path, RESULTS)
     # contour_outlines = show_selection(selection, image, RESULTS)
-
+    location, background_image = show_selection_crop(
+        selection, content_path, RESULTS)
     DETECT_URL = upload_to_gcloud_name(
-        contour_outlines, 'selected_objects.jpg')
+        location, 'selected_objects.jpg')
     return render_template('crop.html', image_url=DETECT_URL)
 
 
