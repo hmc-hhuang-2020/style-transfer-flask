@@ -29,6 +29,8 @@ SHOW_OBJECTS = None
 
 STYLE_URL = None
 
+CONTENT_URL = None
+
 DETECT_URL = None
 
 FINAL_URL = None
@@ -116,7 +118,7 @@ def upload():
     transfer_option = request.form.get('transfer_select')
     if transfer_option == 'whole':
         style_path = request.files['style_file']
-        # STYLE_URL = upload_to_gcloud(style_path)
+        # url = upload_to_gcloud(style_path)
         content_path = request.files['image_file']
         best, best_loss = run_style_transfer(
             content_path, style_path, num_iterations=1)
@@ -137,6 +139,10 @@ def upload():
         # blob = bucket.blob(destination_blob_name)
         # blob.upload_from_file(style_path)
         content_path = request.files['image_file']
+        content_path_copy = request.files['image_file']
+        global CONTENT_URL
+        CONTENT_URL = upload_to_gcloud(content_path_copy)
+        print(content_path_copy)
         # content = request.files['image_file']
         # image = Image.open(content.stream)
         # content_path = image_to_array(image)
@@ -162,7 +168,11 @@ def upload():
         detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
         print("Successfully loaded the model")
 
+        global RESULTS
+        global SHOW_OBJECTS
         RESULTS, SHOW_OBJECTS = load_object(content_path, detection_model)
+
+        content = download_from_gcloud("selected_objects.jpg")
         # load_object(image_file, detection_model)
 
         # config = InferenceConfig()
@@ -177,15 +187,18 @@ def upload():
 
         # contour_outlines = show_selection(raw_input, filename, show_objects)
         url = upload_to_gcloud_name(SHOW_OBJECTS, 'all_objects.jpg')
+
         return render_template('object.html', image_url=url)
 
 
 @app.route("/select", methods=['POST'])
 def select():
+
     selection = request.form.get('chosen_objects')
     selection = [int(x) for x in " ".join(selection.split(",")).split()]
-
-    contour_outlines = show_selection(selection, SHOW_OBJECTS, RESULTS)
+    # content = download_from_gcloud("selected_objects.jpg")
+    content_path = ''
+    contour_outlines = show_selection(selection, content, RESULTS)
 
     DETECT_URL = upload_to_gcloud_name(
         contour_outlines, 'selected_objects.jpg')
