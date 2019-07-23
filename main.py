@@ -1,3 +1,6 @@
+import numpy as np
+from mrcnn import utils
+import mrcnn.model as modellib
 import logging
 import os
 import time
@@ -11,11 +14,9 @@ import cloudstorage as gcs
 # from google.appengine.api import app_identity
 from style_transfer import run_style_transfer
 from PIL import Image
-from object_detection import load_object, show_selection, InferenceConfig
-import mrcnn.model as modellib
-from mrcnn import utils
+from object_detection import load_object, show_selection_outlines,
+show_selection_crop, show_selection_inverse, InferenceConfig
 # from werkzeug.utils import secure_filename
-import numpy as np
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -170,9 +171,8 @@ def upload():
 
         global RESULTS
         global SHOW_OBJECTS
-        RESULTS, SHOW_OBJECTS = load_object(content_path, detection_model)
-
-        content = download_from_gcloud("selected_objects.jpg")
+        content = download_from_gcloud('maskrcnn_test.jpg')
+        RESULTS, SHOW_OBJECTS = load_object(content, detection_model)
         # load_object(image_file, detection_model)
 
         # config = InferenceConfig()
@@ -197,12 +197,14 @@ def select():
     selection = request.form.get('chosen_objects')
     selection = [int(x) for x in " ".join(selection.split(",")).split()]
     # content = download_from_gcloud("selected_objects.jpg")
-    content_path = ''
-    contour_outlines = show_selection(selection, content, RESULTS)
-
+    content_path = download_from_gcloud('maskrcnn_test.jpg')
+    contour_outlines = show_selection_outlines(
+        selection, content_path, RESULTS)
+    location, background_image = show_selection_crop(
+        selection, content_path, RESULTS)
     DETECT_URL = upload_to_gcloud_name(
-        contour_outlines, 'selected_objects.jpg')
-    return render_template('crop.html', image_url=DETECT_URL)
+        location, 'selected_objects.jpg')
+    return render_template('crop.html', image_url=contour_outlines)
 
 
 @app.route("/transform", methods=['POST'])
