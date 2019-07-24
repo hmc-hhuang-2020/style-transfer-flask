@@ -1,40 +1,39 @@
+import tensorflow as tf
+import coco
+from PIL import Image
+from matplotlib.patches import Polygon
+from matplotlib import patches,  lines
+from skimage import measure
+from skimage.measure import find_contours
+import colorsys
+import itertools
+import matplotlib.pyplot as plt
+import matplotlib
+import skimage.io
+import numpy as np
+import math
+import random
+from mrcnn import utils
+import mrcnn.model as modellib
+from mrcnn import visualize
 import os
 import sys
-
-# To find local version
-ROOT_DIR = os.path.abspath("../")
-MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
-sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
-
-sys.path.append(MaskRCNN_DIR)  # To find local version of the library
-MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-
-from mrcnn import visualize
-import mrcnn.model as modellib
-from mrcnn import utils
-# from samples.coco import coco as coco
-import random
-import math
-import numpy as np
-import skimage.io
-import matplotlib
-import matplotlib.pyplot as plt
-
-import itertools
-import colorsys
-
-from skimage.measure import find_contours
-from skimage import measure
-from matplotlib import patches,  lines
-from matplotlib.patches import Polygon
-# from mrcnn import model
-from PIL import Image
-
-import coco
-
-import tensorflow as tf
 import cv2
+from magenta.models.image_stylization import image_utils
+# To find local version
+# ROOT_DIR = os.path.abspath("../")
+# MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
+# sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
+
+# sys.path.append(MaskRCNN_DIR)  # To find local version of the library
+# MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
+# COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+
+# from samples.coco import coco as coco
+
+
+# from mrcnn import model
+
 
 # tf.disable_eager_execution()
 
@@ -105,22 +104,17 @@ def apply_mask_inverse_image(bg, image, mask,):
     return image
 
 
-def load_img(path_to_img):
-    img = skimage.io.imread(path_to_img)
-    return img
-
-
 def load_object(file_name, model):
     # model = modellib.MaskRCNN(
     #     mode="inference", model_dir=MODEL_DIR, config=config)
     image = load_img(file_name)
-
+    print(image)
     # model = os.path.dirname
     results = model.detect([image], verbose=1)
     r = results[0]
     # visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
     #                             class_names, r['scores'])
-
+    print(r)
     N = len(r['rois'])
     colors = random_colors(N)
     figsize = (16, 16)
@@ -132,7 +126,6 @@ def load_object(file_name, model):
     color = (.2, 0.5, 0.9)
     captions = None
     masked_image = image.astype(np.uint32).copy()
-
     counts = {}
     output = []
     for i in range(N):
@@ -166,32 +159,19 @@ def load_object(file_name, model):
     fig = ax.imshow(masked_image.astype(np.uint8))
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
-    plt.savefig('/./mnt/c/Users/Aaron/Downloads/savefig.jpg',
-                bbox_inches='tight', pad_inches=0)
-    all = '/./mnt/c/Users/Aaron/Downloads/savefig.jpg'
-    # ax.axes.get_xaxis().set_visible(False)
-    # ax.axes.get_yaxis().set_visible(False)
-    # ax.imshow(masked_image.astype(np.uint8))
-
-    # im = Image.fromarray(masked_image)
-    # plt.imsave('/./mnt/c/Users/Aaron/Downloads/test1.jpg', masked_image)
-
-    # skimage.io.imsave('/./mnt/c/Users/Aaron/Downloads/output.jpg', masked_image)
-
-    # all = plt.savefig('show.jpg', bbox_inches='tight',
-    #                   pad_inches=0)
-
+    plt.savefig('static/out/all_objects.jpg', bbox_inches='tight',
+                pad_inches=0)
+    all = 'static/out/all_objects.jpg'
     return r, all
 
 
 # Contour Outline
 def show_selection_outlines(raw_input, image, r):
     image = skimage.io.imread(image)
-    # image = skimage.io.imread(os.path.join(IMAGE_DIR, file_name))
     figsize = (16, 16)
     _, ax = plt.subplots(1, figsize=figsize)
 
-#   masked_image = np.zeros_like(image)
+    # color = (.2, 0.5, 0.9)
     masked_image = image.astype(np.uint32).copy()
     contour_outlines = []
     if raw_input == 1000:
@@ -199,8 +179,8 @@ def show_selection_outlines(raw_input, image, r):
     for i in raw_input:
         if i > len(r['rois']) or i < 0:
             continue
+        y1, x1, y2, x2 = r['rois'][i]
         mask = r['masks'][:, :, i]
-#     masked_image = apply_mask(masked_image, mask, color)
         padded_mask = np.zeros(
             (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
         padded_mask[1:-1, 1:-1] = mask
@@ -214,12 +194,9 @@ def show_selection_outlines(raw_input, image, r):
     fig.axes.get_yaxis().set_visible(False)
     # ax.axes.get_xaxis().set_visible(False)
     # ax.axes.get_yaxis().set_visible(False)
-    plt.savefig('/./mnt/c/Users/Aaron/Downloads/selected.jpg', bbox_inches='tight',
+    plt.savefig('static/out/selected_objects.jpg', bbox_inches='tight',
                 pad_inches=0)
-    # outlines = plt.savefig('original.jpg', bbox_inches='tight',
-                        #    pad_inches=0)
-    outlines = '/./mnt/c/Users/Aaron/Downloads/selected.jpg'
-#   ax.imshow(out.astype(np.uint8))
+    outlines = 'static/out/selected_objects.jpg'
     return outlines
 
 
@@ -249,9 +226,8 @@ def show_selection_crop(raw_input, image, r):
     fig = ax.imshow(background_image.astype(np.uint8))
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
-    plt.savefig('/./mnt/c/Users/Aaron/Downloads/crop.jpg',
-                bbox_inches='tight', pad_inches=0)
-    location = '/./mnt/c/Users/Aaron/Downloads/crop.jpg'
+    plt.savefig('static/out/crop.jpg', bbox_inches='tight', pad_inches=0)
+    location = 'static/out/crop.jpg'
     return location, background_image
 
 # Crop image according to selected inverse contours
@@ -283,21 +259,29 @@ def show_selection_inverse(raw_input, image, r):
     fig = ax.imshow(masked_image.astype(np.uint8))
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
-    plt.savefig('/./mnt/c/Users/Aaron/Downloads/crop_inverse.jpg',
+    plt.savefig('static/out/crop_inverse.jpg',
                 bbox_inches='tight', pad_inches=0)
-    location = '/./mnt/c/Users/Aaron/Downloads/crop_inverse.jpg'
+    location = 'static/out/crop_inverse.jpg'
     return location, masked_image
 
 
+def load_img(path_to_img):
+    img = skimage.io.imread(path_to_img)
+    return img
+
+
 def blending(crop_path, original_path, style_path):
-    crop = load_img(crop_path).astype('uint8')
+    styled = cv2.imread(style_path).astype('uint8')
+    crop = cv2.imread(crop_path).astype('uint8')
+    original = cv2.imread(original_path).astype('uint8')
+    styled = cv2.resize(styled, (original.shape[1], original.shape[0]))
+    # crop = cv2.resize(crop, (styled.shape[1], styled.shape[0]))
+    # original = cv2.resize(original, (styled.shape[1], styled.shape[0]))
+
     non_black_pixels_mask = np.any(np.logical_and(
         crop != [0, 0, 0], crop != [255, 255, 255]),  axis=-1)
 
-    original = load_img(original_path).astype('uint8')
-
-    original_copy = original  # <----- original image (or original path)
-    styled = load_img(style_path).astype('uint8')  # <---- stylized image
+    original_copy = original
     mask = crop
     styled = styled.astype(float)
     # styled = styled.reshape(styled.shape[0], styled.shape[1], 3)
@@ -321,9 +305,11 @@ def blending(crop_path, original_path, style_path):
     out = style_layer + regular_layer
 
     out = out.astype('uint8')
-    output_str = 'static/final/styled_final.jpg'
-    out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
+    output_str = 'static/final/styled_final-1.jpg'
+    # out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
     cv2.imwrite(output_str, out)
     return output_str
+
+
 # show_objects = load_object(filename, model)
 # contour_outlines = show_selection(raw_input, filename, show_objects)
