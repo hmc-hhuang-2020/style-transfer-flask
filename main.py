@@ -121,7 +121,7 @@ def upload():
         # content = "images/content_images/image.jpg"
         test = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
-        --output_dir=outputs \
+        --output_dir=static/final \
         --style_images_paths="+style_path+"\
         --content_images_paths="+content_path+"\
         --image_size=256 \
@@ -130,8 +130,11 @@ def upload():
         --style_square_crop=False \
         --logtostderr"
         os.system(test)
-        path = os.path.join(os.path.abspath('outputs'), '%s_stylized_%s_%d.jpg' %
-                            (content_img_name, style_img_name, 0))
+        # path = os.path.join(os.path.abspath('outputs'), '%s_stylized_%s_%d.jpg' %
+        #                     (content_img_name, style_img_name, 0))
+
+        path = 'static/final/' + ('%s_stylized_%s_0.jpg' %
+                            (content_img_name, style_img_name))
         # print(path)
         # im=Image.fromarray(best)
         # im.save('static/out/styled.jpg')
@@ -248,15 +251,17 @@ def transform():
     # style_path = download_from_gcloud(os.path.basename(STYLE_URL))
     # content_path = download_from_gcloud("selected_objects_1.jpg")
 
-    # print(STYLE_URL)
-    # print(CONTENT_URL)
+    print(STYLE_URL)
+    print(LOCATION)
 
-    content_img_name = os.path.basename(CONTENT_URL)[:-4]
+    content_img_name = os.path.basename(LOCATION)[:-4]
     style_img_name = os.path.basename(STYLE_URL)[:-4]
+    print(content_img_name)
+    print(style_img_name)
     # content_img_name = os.path.basename(content_path)[:-4]
     test = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
-        --output_dir=static/final \
+        --output_dir=static/out \
         --style_images_paths="+STYLE_URL+"\
         --content_images_paths="+LOCATION+"\
         --image_size=256 \
@@ -265,9 +270,10 @@ def transform():
         --style_square_crop=False \
         --logtostderr"
     os.system(test)
-    changed_path = os.path.join(os.path.abspath('static/final'), '%s_stylized_%s_%d.jpg' %
-                                (content_img_name, style_img_name, 0))
-    # print(changed_path)
+    changed_path = os.path.join('static/out/',('%s_stylized_%s_0.jpg' % (content_img_name, style_img_name)))
+    # changed_path = 'static/out/crop_stylized_dogs-and-cats_0.jpg'
+    print(changed_path)
+    print(CONTENT_URL)
     # original_path = download_from_gcloud(os.path.basename(CONTENT_URL))
     # print(original_path)
     # crop_path = download_from_gcloud("selected_objects_1.jpg")

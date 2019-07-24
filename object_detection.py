@@ -269,11 +269,19 @@ def load_img(path_to_img):
 
 
 def blending(crop_path, original_path, style_path):
+    print('~~~~~~~~ \n\n crop_path original_path style_path = ', crop_path)
+    print(original_path)
+    print(style_path)
 
-    styled = cv2.imread(style_path).astype('uint8')
-    crop = cv2.imread(crop_path).astype('uint8')
-    original = cv2.imread(original_path).astype('uint8')
+    # styled = cv2.imread(style_path)
+    # crop = cv2.imread(crop_path)
+    # original = cv2.imread(original_path)    
+    
+    crop = cv2.imread(os.path.join(os.path.abspath(""), crop_path)).astype('uint8')
+    original = cv2.imread(os.path.join(os.path.abspath(""), original_path)).astype('uint8')
+    styled = cv2.imread(os.path.join(os.path.abspath(""),style_path)).astype('uint8')
     # styled = cv2.resize(styled, (original.shape[1], original.shape[0]))
+
     print(styled.shape)
     print(original.shape)
     print(styled, original, crop)
