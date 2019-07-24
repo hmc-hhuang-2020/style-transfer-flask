@@ -32,9 +32,9 @@ DETECT_URL = None
 
 FINAL_URL = None
 
-CONTENT_URL = None
+content_copy = None
 
-LOCATION = None
+CONTENT_URL = None
 
 
 def image_to_array(image):
@@ -130,41 +130,29 @@ def upload():
         --style_square_crop=False \
         --logtostderr"
         os.system(test)
-        path = os.path.join(os.path.abspath('outputs'), '%s_stylized_%s_%d.jpg' %
+        path = os.path.join(os.path.abspath('static/out'), '%s_stylized_%s_%d.jpg' %
                             (content_img_name, style_img_name, 0))
         # print(path)
         # im=Image.fromarray(best)
         # im.save('static/out/styled.jpg')
         # styled_file=os.path.join(
         #     os.path.abspath(''), 'static/out/styled.jpg')
-        # url = upload_to_gcloud_name(path, '%s_stylized_%s_%d.jpg' %
-        #                             (content_img_name, style_img_name, 0))
+        url = upload_to_gcloud_name(path, '%s_stylized_%s_%d.jpg' %
+                                    (content_img_name, style_img_name, 0))
         # return render_template('upload.html')
-        return render_template('upload.html', image_url=path)
+        return render_template('upload.html', image_url=url)
     elif transfer_option == 'object':
         # # Upload style image first
-        # style_path = request.files['style_file']
+        style_path = request.files['style_file']
 
-        # global STYLE_URL
-        # STYLE_URL = upload_to_gcloud(style_path)
+        global STYLE_URL
+        STYLE_URL = upload_to_gcloud(style_path)
 
-        # content_path = request.files['image_file']
-        # content_path_copy = request.files['image_file']
+        content_path = request.files['image_file']
+        content_path_copy = request.files['image_file']
 
-        # global CONTENT_URL
-        # CONTENT_URL = upload_to_gcloud(content_path_copy)
-        global STYLE_URL, CONTENT_URL
-        style = request.files['style_file']
-        style_name = secure_filename(style.filename)
-        style_path = os.path.join('static/style_images', style_name)
-        style.save(style_path)
-        STYLE_URL = style_path
-        # url = upload_to_gcloud(style_path)
-        content = request.files['image_file']
-        content_name = secure_filename(content.filename)
-        content_path = os.path.join('static/input_images', content_name)
-        content.save(content_path)
-        CONTENT_URL = content_path
+        global CONTENT_URL
+        CONTENT_URL = upload_to_gcloud(content_path_copy)
 
         # print(content_path_copy)
 
@@ -193,8 +181,7 @@ def upload():
         global RESULTS
         global SHOW_OBJECTS
         # content = download_from_gcloud(os.path.basename(CONTENT_URL))
-        RESULTS, SHOW_OBJECTS = load_object(content_path, detection_model)
-        url = '../'+SHOW_OBJECTS
+        RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
         # load_object(image_file, detection_model)
 
         # config = InferenceConfig()
@@ -208,7 +195,7 @@ def upload():
         # SHOW_OBJECTS = show_objects
 
         # contour_outlines = show_selection(raw_input, filename, show_objects)
-        # url = upload_to_gcloud_name(SHOW_OBJECTS, 'all_objects.jpg')
+        url = upload_to_gcloud_name(SHOW_OBJECTS, 'all_objects.jpg')
         return render_template('object.html', image_url=url)
 
 
@@ -219,19 +206,16 @@ def select():
 
     # content = download_from_gcloud("maskrcnn_test.jpg")
     # content_path = '/./mnt/c/Aaron/Documents/Career/GoogleAMLI/Data/Image'
-    # content_path = download_from_gcloud('maskrcnn_test.jpg')
+    content_path = download_from_gcloud('maskrcnn_test.jpg')
     # image = download_from_gcloud('all_objects.jpg')
     contour_outlines = show_selection_outlines(
-        selection, CONTENT_URL, RESULTS)
-    contour_outlines = '../'+contour_outlines
+        selection, content_path, RESULTS)
     # contour_outlines = show_selection(selection, image, RESULTS)
     location, background_image = show_selection_crop(
-        selection, CONTENT_URL, RESULTS)
-    global LOCATION
-    LOCATION = location
-    # DETECT_URL = upload_to_gcloud_name(
-    #     location, 'selected_objects_1.jpg')
-    return render_template('crop.html', image_url=contour_outlines)
+        selection, content_path, RESULTS)
+    DETECT_URL = upload_to_gcloud_name(
+        location, 'selected_objects_1.jpg')
+    return render_template('crop.html', image_url=DETECT_URL)
 
 
 @app.route("/transform", methods=['POST'])
@@ -245,41 +229,40 @@ def transform():
     # gcs_file = storage.open(DETECT_URL)
     # content_path = gcs_file.read()
     # gcs_file.close()
-    # style_path = download_from_gcloud(os.path.basename(STYLE_URL))
-    # content_path = download_from_gcloud("selected_objects_1.jpg")
+    style_path = download_from_gcloud(os.path.basename(STYLE_URL))
+    content_path = download_from_gcloud("selected_objects_1.jpg")
 
-    # print(STYLE_URL)
-    # print(CONTENT_URL)
+    print(STYLE_URL)
+    print(CONTENT_URL)
 
-    content_img_name = os.path.basename(CONTENT_URL)[:-4]
-    style_img_name = os.path.basename(STYLE_URL)[:-4]
+    content_img_name = os.path.basename(content_path)[:-4]
+    style_img_name = os.path.basename(style_path)[:-4]
     # content_img_name = os.path.basename(content_path)[:-4]
     test = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
-        --output_dir=static/final \
-        --style_images_paths="+STYLE_URL+"\
-        --content_images_paths="+LOCATION+"\
+        --output_dir=outputs \
+        --style_images_paths="+style_path+"\
+        --content_images_paths="+content_path+"\
         --image_size=256 \
         --content_square_crop=False \
         --style_image_size=256 \
         --style_square_crop=False \
         --logtostderr"
     os.system(test)
-    changed_path = os.path.join(os.path.abspath('static/final'), '%s_stylized_%s_%d.jpg' %
+    changed_path = os.path.join(os.path.abspath('outputs'), '%s_stylized_%s_%d.jpg' %
                                 (content_img_name, style_img_name, 0))
-    # print(changed_path)
-    # original_path = download_from_gcloud(os.path.basename(CONTENT_URL))
-    # print(original_path)
+    print(changed_path)
+    original_path = download_from_gcloud(os.path.basename(CONTENT_URL))
+    print(original_path)
     # crop_path = download_from_gcloud("selected_objects_1.jpg")
-    output_str = blending(LOCATION, CONTENT_URL, changed_path)
-    url = '../'+ output_str
-    # url = upload_to_gcloud_name(output_str, 'styled_final.jpg')
+    output_str = blending(content_path, original_path, changed_path)
+    url = upload_to_gcloud_name(output_str, 'styled_final.jpg')
     return render_template('final.html', image_url=url)
 
 
 @app.route("/download", methods=['GET'])
 def download():
-    # final_url = download_from_gcloud("styled_final.jpg")
+    final_url = download_from_gcloud("styled_final.jpg")
     # final = 'styled_final.jpg'
     # client = storage.Client()
     # bucket = client.get_bucket(CLOUD_STORAGE_BUCKET)
