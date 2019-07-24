@@ -10,7 +10,8 @@ from PIL import Image
 # from object_detection import load_object, show_selection, InferenceConfig
 import mrcnn.model as modellib
 
-from object_detection import load_object, show_selection_outlines,show_selection_crop, show_selection_inverse, InferenceConfig
+from object_detection import load_object, show_selection_outlines, show_selection_crop, show_selection_inverse, InferenceConfig, blending
+from werkzeug.utils import secure_filename
 
 # import tensorflow as tf
 # tf.enable_eager_execution()
@@ -93,30 +94,62 @@ def about():
 def upload():
     transfer_option = request.form.get('transfer_select')
     if transfer_option == 'whole':
-        style_path = request.files['style_file']
+        style = request.files['style_file']
+        # style_path = request.files['style_file']
+        style_name = secure_filename(style.filename)
+        style_path = os.path.join('static/style_images', style_name)
+
+        style.save(style_path)
         # url = upload_to_gcloud(style_path)
-        content_path = request.files['image_file']
-        best, best_loss = run_style_transfer(
-            content_path, style_path, num_iterations=1)
-        im = Image.fromarray(best)
-        im.save('static/out/styled.jpg')
-        styled_file = os.path.join(
-            os.path.abspath(''), 'static/out/styled.jpg')
-        url = upload_to_gcloud_name(styled_file, 'styled_image.jpg')
+        content = request.files['image_file']
+        content_name = secure_filename(content.filename)
+        content_path = os.path.join('static/input_images', content_name)
+        content.save(content_path)
+
+        content_img_name = os.path.basename(content_path)[:-4]
+        style_img_name = os.path.basename(style_path)[:-4]
+        # content_path = request.path['image_file']
+        # print(style_path)
+        # best, best_loss = run_style_transfer(
+        #     content_path, style_path, num_iterations=1)
+        # style = "images/style_images/statue_of_liberty_sq.jpg"
+        # content = "images/content_images/image.jpg"
+        test = "arbitrary_image_stylization_with_weights \
+        --checkpoint=arbitrary_style_transfer/model.ckpt \
+        --output_dir=outputs \
+        --style_images_paths="+style_path+"\
+        --content_images_paths="+content_path+"\
+        --image_size=256 \
+        --content_square_crop=False \
+        --style_image_size=256 \
+        --style_square_crop=False \
+        --logtostderr"
+        os.system(test)
+        path = os.path.join(os.path.abspath('outputs'), '%s_stylized_%s_%d.jpg' %
+                            (content_img_name, style_img_name, 0))
+        # print(path)
+        # im=Image.fromarray(best)
+        # im.save('static/out/styled.jpg')
+        # styled_file=os.path.join(
+        #     os.path.abspath(''), 'static/out/styled.jpg')
+        url = upload_to_gcloud_name(path, '%s_stylized_%s_%d.jpg' %
+                                    (content_img_name, style_img_name, 0))
+        # return render_template('upload.html')
         return render_template('upload.html', image_url=url)
     elif transfer_option == 'object':
         # # Upload style image first
-        # style_path = request.files['style_file']
-        # STYLE_URL = upload_to_gcloud(style_path)
-        # url = STYLE_URL
-        # storage_client = storage.Client(project='amli-245518')
-        # bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
-        # destination_blob_name = 'style.jpg'
-        # blob = bucket.blob(destination_blob_name)
-        # blob.upload_from_file(style_path)
+        #         style_path = request.files['style_file']
+        global STYLE_URL
+        STYLE_URL = upload_to_gcloud(style_path)
         content_path = request.files['image_file']
-        content_path_copy = content_path
+        content_path_copy = request.files['image_file']
+        global CONTENT_URL
+        CONTENT_URL = upload_to_gcloud(content_path_copy)
         print(content_path_copy)
+
+        # content_path = request.files['image_file']
+        # content_path_copy = content_path
+        # print(content_path_copy)
 
         ROOT_DIR = os.path.abspath("../")
         MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
@@ -165,12 +198,9 @@ def select():
     # content = download_from_gcloud("maskrcnn_test.jpg")
     # content_path = '/./mnt/c/Aaron/Documents/Career/GoogleAMLI/Data/Image'
     content_path = download_from_gcloud('maskrcnn_test.jpg')
-
-    print(SHOW_OBJECTS)
-    print(RESULTS)
     # image = download_from_gcloud('all_objects.jpg')
-
-    contour_outlines = show_selection_outlines(selection, content_path, RESULTS)
+    contour_outlines = show_selection_outlines(
+        selection, content_path, RESULTS)
     # contour_outlines = show_selection(selection, image, RESULTS)
     location, background_image = show_selection_crop(
         selection, content_path, RESULTS)
@@ -191,18 +221,26 @@ def transform():
     # gcs_file.close()
     style_path = download_from_gcloud("style.jpg")
     content_path = download_from_gcloud("selected_objects.jpg")
-    # best, best_loss = run_style_transfer(
-    #     DETECT_URL, STYLE_URL, num_iterations=1)
-
-    from style_transfer import run_style_transfer
-    best, best_loss = run_style_transfer(
-        content_path, style_path, num_iterations=1)
-    im = Image.fromarray(best)
-    im.save('static/out/styled_final.jpg')
-    styled_file = os.path.join(
-        os.path.abspath(''), 'static/out/styled_final.jpg')
-
-    url = upload_to_gcloud_name(styled_file, 'styled_final.jpg')
+    content_img_name = os.path.basename(content_path)[:-4]
+    style_img_name = os.path.basename(style_path)[:-4]
+    content_img_name = os.path.basename(content_path)[:-4]
+    test = "arbitrary_image_stylization_with_weights \
+        --checkpoint=arbitrary_style_transfer/model.ckpt \
+        --output_dir=outputs \
+        --style_images_paths="+style_path+"\
+        --content_images_paths="+content_path+"\
+        --image_size=256 \
+        --content_square_crop=False \
+        --style_image_size=256 \
+        --style_square_crop=False \
+        --logtostderr"
+    os.system(test)
+    changed_path = os.path.join(os.path.abspath('outputs'), '%s_stylized_%s_%d.jpg' %
+                                (content_img_name, style_img_name, 0))
+    original_path = download_from_gcloud(os.path.basename(CONTENT_URL))
+    crop_path = download_from_gcloud("selected_objects.jpg")
+    output_str = blending(crop_path, original_path, changed_path)
+    url = upload_to_gcloud_name(output_str, 'styled_final.jpg')
     return render_template('final.html', image_url=url)
 
 

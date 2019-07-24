@@ -34,8 +34,9 @@ from PIL import Image
 import coco
 
 import tensorflow as tf
+import cv2
 
-tf.disable_eager_execution()
+# tf.disable_eager_execution()
 
 
 class InferenceConfig(coco.CocoConfig):
@@ -105,19 +106,7 @@ def apply_mask_inverse_image(bg, image, mask,):
 
 
 def load_img(path_to_img):
-    max_dim = 256
-
     img = skimage.io.imread(path_to_img)
-
-    long = max(img.shape)
-    scale = max_dim/long
-    # img = skimage.transform.resize(
-    #     img, (round(img.shape[0]*scale), round(img.shape[1]*scale)))
-
-    # img = kp_image.img_to_array(img)
-
-    # We need to broadcast the image array such that it has a batch dimension
-    # img = np.expand_dims(img, axis=0)
     return img
 
 
@@ -298,5 +287,43 @@ def show_selection_inverse(raw_input, image, r):
                 bbox_inches='tight', pad_inches=0)
     location = '/./mnt/c/Users/Aaron/Downloads/crop_inverse.jpg'
     return location, masked_image
+
+
+def blending(crop_path, original_path, style_path):
+    crop = load_img(crop_path).astype('uint8')
+    non_black_pixels_mask = np.any(np.logical_and(
+        crop != [0, 0, 0], crop != [255, 255, 255]),  axis=-1)
+
+    original = load_img(original_path).astype('uint8')
+
+    original_copy = original  # <----- original image (or original path)
+    styled = load_img(style_path).astype('uint8')  # <---- stylized image
+    mask = crop
+    styled = styled.astype(float)
+    # styled = styled.reshape(styled.shape[0], styled.shape[1], 3)
+    # original_copy = original_copy.reshape(
+    #     original_copy.shape[1], original_copy.shape[2], 3)
+    original_copy = original_copy.astype(float)
+
+    mask[non_black_pixels_mask] = [255, 255, 255]
+    m = mask
+    # m = m.reshape(original.shape[1], original.shape[2], 3)
+
+    # cv2.imwrite('static/out/bin-mask-str.jpg', m)
+    blurSigma = 5
+    m = m.astype(float)/255.0
+    # m = cv2.imread('static/out/bin-mask-str.jpg').astype(float)/255.0
+    m = cv2.GaussianBlur(m, (2*blurSigma+1, 2*blurSigma+1), blurSigma)
+
+    # apply alpha blending
+    style_layer = cv2.multiply(m, styled)
+    regular_layer = cv2.multiply(1.0-m, original_copy)
+    out = style_layer + regular_layer
+
+    out = out.astype('uint8')
+    output_str = 'static/final/styled_final.jpg'
+    out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(output_str, out)
+    return output_str
 # show_objects = load_object(filename, model)
 # contour_outlines = show_selection(raw_input, filename, show_objects)
