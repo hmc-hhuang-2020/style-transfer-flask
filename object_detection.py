@@ -35,7 +35,7 @@ import coco
 
 import tensorflow as tf
 
-# tf.disable_eager_execution()
+tf.disable_eager_execution()
 
 
 class InferenceConfig(coco.CocoConfig):
@@ -236,6 +236,7 @@ def show_selection_outlines(raw_input, image, r):
 
 # Crop image according to selected contours
 def show_selection_crop(raw_input, image, r):
+    image = skimage.io.imread(image)
     figsize = (16, 16)
     _, ax = plt.subplots(1, figsize=figsize)
     ax.axis('off')
@@ -268,6 +269,7 @@ def show_selection_crop(raw_input, image, r):
 
 
 def show_selection_inverse(raw_input, image, r):
+    image = skimage.io.imread(image)
     figsize = (16, 16)
     _, ax = plt.subplots(1, figsize=figsize)
 

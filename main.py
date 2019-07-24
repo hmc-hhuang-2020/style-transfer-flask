@@ -1,4 +1,3 @@
-import mrcnn.model as modellib
 import logging
 import os
 import sys
@@ -8,8 +7,13 @@ from flask import (Flask, flash, make_response, redirect, render_template,
 from google.cloud import storage
 # from style_transfer import run_style_transfer
 from PIL import Image
-from object_detection import load_object, show_selection_outlines,
-show_selection_crop, show_selection_inverse, InferenceConfig
+# from object_detection import load_object, show_selection, InferenceConfig
+import mrcnn.model as modellib
+
+from object_detection import load_object, show_selection_outlines,show_selection_crop, show_selection_inverse, InferenceConfig
+
+# import tensorflow as tf
+# tf.enable_eager_execution()
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -166,7 +170,7 @@ def select():
     print(RESULTS)
     # image = download_from_gcloud('all_objects.jpg')
 
-    contour_outlines = show_selection(selection, content_path, RESULTS)
+    contour_outlines = show_selection_outlines(selection, content_path, RESULTS)
     # contour_outlines = show_selection(selection, image, RESULTS)
     location, background_image = show_selection_crop(
         selection, content_path, RESULTS)
