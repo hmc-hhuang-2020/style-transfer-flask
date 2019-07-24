@@ -33,9 +33,9 @@ import os
 # print(path)
 
 from object_detection import blending
-crop_path = 'static/blending/crop.jpg'
+crop_path = 'static/blending/crop1.jpg'
 original_path = 'static/blending/original.jpg'
-style_path = 'static/blending/applied.jpg'
+style_path = 'static/blending/original_stylized_Vassily_Kandinsky,_1913_-_Composition_7_0.jpg'
 print(blending(crop_path, original_path, style_path))
 
 # test1 = None

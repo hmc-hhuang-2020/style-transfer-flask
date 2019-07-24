@@ -1,42 +1,40 @@
-import tensorflow as tf
-import coco
-from PIL import Image
-from matplotlib.patches import Polygon
-from matplotlib import patches,  lines
-from skimage import measure
-from skimage.measure import find_contours
-import colorsys
-import itertools
-import matplotlib.pyplot as plt
-import matplotlib
-import skimage.io
-import numpy as np
-import math
-import random
-from mrcnn import utils
-import mrcnn.model as modellib
-from mrcnn import visualize
 import os
 import sys
-import cv2
-from magenta.models.image_stylization import image_utils
+
 # To find local version
-# ROOT_DIR = os.path.abspath("../")
-# MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
-# sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
+ROOT_DIR = os.path.abspath("../")
+MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
+sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
 
-# sys.path.append(MaskRCNN_DIR)  # To find local version of the library
-# MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
-# COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+sys.path.append(MaskRCNN_DIR)  # To find local version of the library
+MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
+from mrcnn import visualize
+import mrcnn.model as modellib
+from mrcnn import utils
 # from samples.coco import coco as coco
+import random
+import math
+import numpy as np
+import skimage.io
+import matplotlib
+import matplotlib.pyplot as plt
 
+import itertools
+import colorsys
 
+from skimage.measure import find_contours
+from skimage import measure
+from matplotlib import patches,  lines
+from matplotlib.patches import Polygon
 # from mrcnn import model
+from PIL import Image
 
+import coco
 
-# tf.disable_eager_execution()
-
+import tensorflow as tf
+import cv2
 
 class InferenceConfig(coco.CocoConfig):
     # Set batch size to 1 since we'll be running inference on
@@ -271,12 +269,16 @@ def load_img(path_to_img):
 
 
 def blending(crop_path, original_path, style_path):
+
     styled = cv2.imread(style_path).astype('uint8')
     crop = cv2.imread(crop_path).astype('uint8')
     original = cv2.imread(original_path).astype('uint8')
-    styled = cv2.resize(styled, (original.shape[1], original.shape[0]))
-    # crop = cv2.resize(crop, (styled.shape[1], styled.shape[0]))
-    # original = cv2.resize(original, (styled.shape[1], styled.shape[0]))
+    # styled = cv2.resize(styled, (original.shape[1], original.shape[0]))
+    print(styled.shape)
+    print(original.shape)
+    print(styled, original, crop)
+    crop = cv2.resize(crop, (styled.shape[1], styled.shape[0]))
+    original = cv2.resize(original, (styled.shape[1], styled.shape[0]))
 
     non_black_pixels_mask = np.any(np.logical_and(
         crop != [0, 0, 0], crop != [255, 255, 255]),  axis=-1)
