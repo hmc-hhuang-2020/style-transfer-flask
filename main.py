@@ -138,14 +138,18 @@ def upload():
         return render_template('upload.html', image_url=url)
     elif transfer_option == 'object':
         # # Upload style image first
-        #         style_path = request.files['style_file']
+        style_path = request.files['style_file']
+        
         global STYLE_URL
         STYLE_URL = upload_to_gcloud(style_path)
+        
         content_path = request.files['image_file']
         content_path_copy = request.files['image_file']
+        
         global CONTENT_URL
         CONTENT_URL = upload_to_gcloud(content_path_copy)
-        print(content_path_copy)
+        
+        # print(content_path_copy)
 
         # content_path = request.files['image_file']
         # content_path_copy = content_path
@@ -154,8 +158,8 @@ def upload():
         ROOT_DIR = os.path.abspath("../")
         MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
 
-        global CONTENT_URL
-        CONTENT_URL = upload_to_gcloud(content_path_copy)
+        # global CONTENT_URL
+        # CONTENT_URL = upload_to_gcloud(content_path_copy)
 
         # sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
 
@@ -239,8 +243,8 @@ def transform():
                                 (content_img_name, style_img_name, 0))
     original_path = download_from_gcloud(os.path.basename(CONTENT_URL))
     crop_path = download_from_gcloud("selected_objects.jpg")
-    output_str = blending(crop_path, original_path, changed_path)
-    url = upload_to_gcloud_name(output_str, 'styled_final.jpg')
+    # output_str = blending(crop_path, original_path, changed_path)
+    url = upload_to_gcloud_name(changed_path, 'styled_final.jpg')
     return render_template('final.html', image_url=url)
 
 
