@@ -9,3 +9,25 @@ handlers:
   script: main.app
 builtins:
 - deferred: on
+
+libraries:
+- name: PIL
+  version: "1.1.7"
+- name: webob
+  version: "1.1.1"
+- name: numpy
+  version: "1.6.1"
+- name: webapp2
+  version: "2.5.2"  
+   
+  
+
+skip_files:
+- ^venv$
+- ^\.git$
+- ^lib/numpy$
+- ^arbitrary_style_transfer$
+- ^lib/scipy/.dylibs$
+- ^lib/cv2/cv2.cpython-36m-darwin.so$
+- ^lib/tensorflow/python/_pywrap_tensorflow_internal.so$
+- ^lib/llvmlite/binding$

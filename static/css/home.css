@@ -43,6 +43,29 @@ h1 {
   color: white;
 }
 
+.center {
+  display: table-cell;
+  margin-left: auto;
+  margin-right: auto;
+  height: 600px;;
+}
+
+.verticalcenter {
+  margin-left: auto;
+  margin-right: auto;
+  display: table-cell;
+  height: 400px;
+}
+
+.verticalcenter_crop {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  text-align: center;
+  height: 200px;
+}
+
+
 .objectClass{
   width: 200px;
   height: 100px;
@@ -50,6 +73,7 @@ h1 {
   bottom: 0;
   margin: auto 0 auto 0;
   right: 20%;
+  align: middle;
 }
 
 .styleImageClass{

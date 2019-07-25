@@ -5,16 +5,13 @@ import time
 from flask import (Flask, flash, make_response, redirect, render_template,
                    request, send_file, session, url_for)
 from google.cloud import storage
-# from style_transfer import run_style_transfer
 from PIL import Image
-# from object_detection import load_object, show_selection, InferenceConfig
 import mrcnn.model as modellib
+from mrcnn import utils
 
 from object_detection import load_object, show_selection_outlines, show_selection_crop, show_selection_inverse, InferenceConfig, blending
 from werkzeug.utils import secure_filename
 
-# import tensorflow as tf
-# tf.enable_eager_execution()
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -36,15 +33,15 @@ CONTENT_URL = None
 
 LOCATION = None
 
+# ROOT_DIR = os.path.abspath("")
+# MaskRCNN_DIR = os.path.abspath("Mask_RCNN")
+# MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
+# COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
-def image_to_array(image):
-    # Restricts to RGB
-    im_array = np.array(image)[:, :, :3]
+# config = InferenceConfig()
 
-    if np.max(im_array) <= 1.0:
-        im_array = np.floor(im_array * 255).astype(np.uint8)
-
-    return im_array
+# detection_model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
+# detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
 
 
 def upload_to_gcloud(file):
@@ -92,7 +89,7 @@ def about():
 
 @app.route('/test')
 def test():
-    return render_template('crop.html')
+    return render_template('object.html')
 
 
 @app.route('/upload', methods=['POST'])
@@ -100,12 +97,10 @@ def upload():
     transfer_option = request.form.get('transfer_select')
     if transfer_option == 'whole':
         style = request.files['style_file']
-        # style_path = request.files['style_file']
         style_name = secure_filename(style.filename)
         style_path = os.path.join('static/style_images', style_name)
 
         style.save(style_path)
-        # url = upload_to_gcloud(style_path)
         content = request.files['image_file']
         content_name = secure_filename(content.filename)
         content_path = os.path.join('static/input_images', content_name)
@@ -113,15 +108,9 @@ def upload():
 
         content_img_name = os.path.basename(content_path)[:-4]
         style_img_name = os.path.basename(style_path)[:-4]
-        # content_path = request.path['image_file']
-        # print(style_path)
-        # best, best_loss = run_style_transfer(
-        #     content_path, style_path, num_iterations=1)
-        # style = "images/style_images/statue_of_liberty_sq.jpg"
-        # content = "images/content_images/image.jpg"
         test = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
-        --output_dir=static/final \
+        --output_dir=static/out \
         --style_images_paths="+style_path+"\
         --content_images_paths="+content_path+"\
         --image_size=256 \
@@ -130,62 +119,30 @@ def upload():
         --style_square_crop=False \
         --logtostderr"
         os.system(test)
-        # path = os.path.join(os.path.abspath('outputs'), '%s_stylized_%s_%d.jpg' %
-        #                     (content_img_name, style_img_name, 0))
-
-        path = 'static/final/' + ('%s_stylized_%s_0.jpg' %
-                            (content_img_name, style_img_name))
-        # print(path)
-        # im=Image.fromarray(best)
-        # im.save('static/out/styled.jpg')
-        # styled_file=os.path.join(
-        #     os.path.abspath(''), 'static/out/styled.jpg')
-        # url = upload_to_gcloud_name(path, '%s_stylized_%s_%d.jpg' %
-        #                             (content_img_name, style_img_name, 0))
-        # return render_template('upload.html')
+        path = 'static/out/'+('%s_stylized_%s_0.jpg' %
+                              (content_img_name, style_img_name))
         return render_template('upload.html', image_url=path)
     elif transfer_option == 'object':
         # # Upload style image first
-        # style_path = request.files['style_file']
-
-        # global STYLE_URL
-        # STYLE_URL = upload_to_gcloud(style_path)
-
-        # content_path = request.files['image_file']
-        # content_path_copy = request.files['image_file']
-
-        # global CONTENT_URL
-        # CONTENT_URL = upload_to_gcloud(content_path_copy)
         global STYLE_URL, CONTENT_URL
         style = request.files['style_file']
         style_name = secure_filename(style.filename)
         style_path = os.path.join('static/style_images', style_name)
         style.save(style_path)
         STYLE_URL = style_path
-        # url = upload_to_gcloud(style_path)
         content = request.files['image_file']
         content_name = secure_filename(content.filename)
         content_path = os.path.join('static/input_images', content_name)
         content.save(content_path)
         CONTENT_URL = content_path
 
-        # print(content_path_copy)
+        ROOT_DIR = os.path.abspath("")
+        MaskRCNN_DIR = ROOT_DIR
 
-        # content_path = request.files['image_file']
-        # content_path_copy = content_path
-        # print(content_path_copy)
-
-        ROOT_DIR = os.path.abspath("../")
-        MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
-
-        # global CONTENT_URL
-        # CONTENT_URL = upload_to_gcloud(content_path_copy)
-
-        # sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
-
-        # sys.path.append(MaskRCNN_DIR)  # To find local version of the library
-        MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
+        MODEL_DIR = os.path.join(MaskRCNN_DIR, "coco.py")
         COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+        if not os.path.exists(COCO_MODEL_PATH):
+            utils.download_trained_weights(COCO_MODEL_PATH)
 
         config = InferenceConfig()
 
@@ -195,24 +152,8 @@ def upload():
 
         global RESULTS
         global SHOW_OBJECTS
-        # content = download_from_gcloud(os.path.basename(CONTENT_URL))
-        RESULTS, SHOW_OBJECTS = load_object(content_path, detection_model)
-        url = '../'+SHOW_OBJECTS
-        # load_object(image_file, detection_model)
-
-        # config = InferenceConfig()
-
-        # model = modellib.MaskRCNN(
-        #     mode="inference", model_dir=MODEL_DIR, config=config)
-        # model.load_weights(COCO_MODEL_PATH, by_name=True)
-
-        # results, show_objects = load_object(image_file)
-        # RESULTS = results
-        # SHOW_OBJECTS = show_objects
-
-        # contour_outlines = show_selection(raw_input, filename, show_objects)
-        # url = upload_to_gcloud_name(SHOW_OBJECTS, 'all_objects.jpg')
-        return render_template('object.html', image_url=url)
+        RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
+        return render_template('object.html', image_url=SHOW_OBJECTS)
 
 
 @app.route("/select", methods=['POST'])
@@ -220,48 +161,24 @@ def select():
     selection = request.form.get('chosen_objects')
     selection = [int(x) for x in " ".join(selection.split(",")).split()]
 
-    # content = download_from_gcloud("maskrcnn_test.jpg")
-    # content_path = '/./mnt/c/Aaron/Documents/Career/GoogleAMLI/Data/Image'
-    # content_path = download_from_gcloud('maskrcnn_test.jpg')
-    # image = download_from_gcloud('all_objects.jpg')
     contour_outlines = show_selection_outlines(
         selection, CONTENT_URL, RESULTS)
-    contour_outlines = '../'+contour_outlines
-    # contour_outlines = show_selection(selection, image, RESULTS)
+
     location, background_image = show_selection_crop(
         selection, CONTENT_URL, RESULTS)
     global LOCATION
     LOCATION = location
-    # DETECT_URL = upload_to_gcloud_name(
-    #     location, 'selected_objects_1.jpg')
     return render_template('crop.html', image_url=contour_outlines)
 
 
 @app.route("/transform", methods=['POST'])
 def transform():
-    # CONTENT_URL = "gs://style-input-images-1/maskrcnn_test.jpg"
-    # STYLE_URL = "/style-input-images-1/Vassily_Kandinsky,_1913_-_Composition_7.jpg"
-    # gcs_file = storage.open(STYLE_URL)
-    # style_path = gcs_file.read()
-    # gcs_file.close()
-    # DETECT_URL = "/style-input-images-1/styled_image.jpg"
-    # gcs_file = storage.open(DETECT_URL)
-    # content_path = gcs_file.read()
-    # gcs_file.close()
-    # style_path = download_from_gcloud(os.path.basename(STYLE_URL))
-    # content_path = download_from_gcloud("selected_objects_1.jpg")
-
-    print(STYLE_URL)
-    print(LOCATION)
-
     content_img_name = os.path.basename(LOCATION)[:-4]
     style_img_name = os.path.basename(STYLE_URL)[:-4]
-    print(content_img_name)
-    print(style_img_name)
-    # content_img_name = os.path.basename(content_path)[:-4]
+
     test = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
-        --output_dir=static/out \
+        --output_dir=static/final \
         --style_images_paths="+STYLE_URL+"\
         --content_images_paths="+LOCATION+"\
         --image_size=256 \
@@ -270,245 +187,15 @@ def transform():
         --style_square_crop=False \
         --logtostderr"
     os.system(test)
-    changed_path = os.path.join('static/out/',('%s_stylized_%s_0.jpg' % (content_img_name, style_img_name)))
-    # changed_path = 'static/out/crop_stylized_dogs-and-cats_0.jpg'
-    print(changed_path)
-    print(CONTENT_URL)
-    # original_path = download_from_gcloud(os.path.basename(CONTENT_URL))
-    # print(original_path)
-    # crop_path = download_from_gcloud("selected_objects_1.jpg")
+    changed_path = 'static/final/' + ('%s_stylized_%s_0.jpg' %
+                                      (content_img_name, style_img_name))
     output_str = blending(LOCATION, CONTENT_URL, changed_path)
-    url = '../'+ output_str
-    # url = upload_to_gcloud_name(output_str, 'styled_final.jpg')
-    return render_template('final.html', image_url=url)
+    return render_template('final.html', image_url=output_str)
 
 
 @app.route("/download", methods=['GET'])
 def download():
-    # final_url = download_from_gcloud("styled_final.jpg")
-    # final = 'styled_final.jpg'
-    # client = storage.Client()
-    # bucket = client.get_bucket(CLOUD_STORAGE_BUCKET)
-    # blob = bucket.blob(final)
-    # filename = 'final.jpg'
-    # blob.download_to_filename(filename)
     return render_template('home.html')
-
-
-# @app.route('/upload', methods=['POST'])
-# def upload():
-#     # style_path = request.files['style_file']
-#     # content_path = request.files['image_file']
-#     # best, best_loss = run_style_transfer(
-#     #     content_path, style_path, num_iterations=500)
-#     # Image.fromarray(best)
-#     # im = Image.fromarray(best)
-#     # styled = im.save('styled.jpg')
-#     image_file = request.files['image_file']
-
-#     print(image_file)
-
-#     # model = os.path.join(os.path.abspath(''), 'rcnn_model.pkl')
-#     # show_objects = load_object(image_file, model)
-#     # contour_outlines = show_selection(raw_input, filename, show_objects)
-
-#     # To find local version
-#     ROOT_DIR = os.path.abspath("../")
-#     MaskRCNN_DIR = os.path.abspath("../Mask_RCNN")
-#     # sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
-
-#     # sys.path.append(MaskRCNN_DIR)  # To find local version of the library
-#     MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
-#     COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-
-#     config = InferenceConfig()
-
-#     detection_model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
-#     detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
-
-
-#     load_object(image_file, detection_model)
-
-#     # storage_client = storage.Client(project='amli-245518')
-#     # bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
-#     # destination_blob_name = 'test.jpg'
-#     # blob = bucket.blob(destination_blob_name)
-#     # blob.upload_from_filename(style_file.filename)
-#     # print("Send file")
-
-#     return render_template('upload.html')
-
-
-# @app.route('/uploaded', methods=['GET'])
-# def uploaded():
-#     return render_template('upload.html')
-
-#     style_file = request.files['style_file']
-#     blob.upload_from_filename(style_file)
-
-#     style_file = request.files['style_file']
-#     image_file = request.files['image_file']
-#     if(style_file and allowed_file(style_file.filename) and image_file and allowed_file(image_file.filename)):
-
-#         # Get files and styled image
-#         output_img = 'static/out/' + time.ctime().replace(' ', '_')+'.jpg'
-#         style_image = stylize(style_file, image_file,
-#                               output_img, "rcnn_model.pkl")
-
-#         # S3 Bucket
-#         bucketName = "style-transfer-web"
-
-#         # S3 upload image
-#         s3 = boto3.client('s3')
-#         s3.put_object(Body=style_image, Bucket=bucketName,
-#                       Key=output_img, ContentType='image/jpeg')
-
-#         session['file'] = output_img
-#         return(render_template("home.html"))
-
-# @app.route('/upload/', methods=['POST', 'GET'])
-# def upload():
-#     if 'file' in session:
-#         # S3 Bucket
-#         bucketName = "style-transfer-web"
-#         s3 = boto3.resource('s3')
-#         obj = s3.Object(bucketName, session['file'])
-#         obj.delete()
-#         session.clear()
-#     style_file = request.files['style_file']
-#     image_file = request.files['image_file']
-#     if(style_file and allowed_file(style_file.filename) and image_file and allowed_file(image_file.filename)):
-
-#         # Get files and styled image
-#         output_img = 'static/out/' + time.ctime().replace(' ', '_')+'.jpg'
-#         style_image = stylize(style_file, image_file,
-#                               output_img, "rcnn_model.pkl")
-
-#         # S3 Bucket
-#         bucketName = "style-transfer-web"
-
-#         # S3 upload image
-#         s3 = boto3.client('s3')
-#         s3.put_object(Body=style_image, Bucket=bucketName,
-#                       Key=output_img, ContentType='image/jpeg')
-
-#         session['file'] = output_img
-#         return(render_template("home.html"))
-
-
-# @app.route('/submitted', methods=['POST'])
-# def submitted_form():
-#     """Process the uploaded file and upload it to Google Cloud Storage."""
-#     # uploaded_file = request.files['file']
-
-#     # if not uploaded_file:
-#     #     return 'No file uploaded.', 400
-
-#     # Create a Cloud Storage client.
-#     gcs = storage.Client()
-
-#     if request.method == 'POST':
-#         file = request.files['file']
-#         bucket_name = "style-input-images-1"
-#         path = '/' + bucket_name + '/' + str(secure_filename(file.filename))
-#         if file and allowed_file(file.filename):
-#             try:
-#                 with gcs.open(path, 'w', **options) as f:
-#                     f.write(file.stream.read())
-#                     print(jsonify({"success": True}))
-#                 return jsonify({"success": True})
-#             except Exception as e:
-#                 logging.exception(e)
-#                 return jsonify({"success": False})
-#     return render_template('home.html')
-
-
-# @app.route('/submitted', methods=['POST'])
-# def upload():
-#     if request.method == "POST":
-#         file = request.files.get("file")
-#         my_upload = storage.upload(file)
-
-#             # some useful properties
-#         name = my_upload.name
-#         size = my_upload.size
-#         url = my_upload.url
-#         return render_template('home.html')
-
-
-# @app.route('/submitted', methods=['POST'])
-# def submitted_form():
-#     # image = request.files['file']
-#     # [END submitted]
-#     # [START render_template]
-#     if request.method == 'POST':
-#         file = request.files['file']
-#         extension = secure_filename(file.filename).rsplit('.', 1)[1]
-#         options = {}
-#         options['retry_params'] = gcs.RetryParams(backoff_factor=1.1)
-#         options['content_type'] = 'image/' + extension
-#         bucket_name = "style-input-images-1"
-#         path = '/' + bucket_name + '/' + str(secure_filename(file.filename))
-#         if file and allowed_file(file.filename):
-#             try:
-#                 with gcs.open(path, 'w', **options) as f:
-#                     f.write(file.stream.read())
-#                     print(jsonify({"success": True}))
-#                 return jsonify({"success": True})
-#             except Exception as e:
-#                 logging.exception(e)
-#                 return jsonify({"success": False})
-#     return render_template('home.html')
-
-# @app.route('/submitted', methods=['POST'])
-# def submitted_form():
-    # """Process the uploaded file and upload it to Google Cloud Storage."""
-    # uploaded_file = request.files.get('file')
-
-    # if not uploaded_file:
-    #     return 'No file uploaded.', 400
-
-    # # Create a Cloud Storage client.
-    # gcs = storage.Client()
-
-    # # Get the bucket that the file will be uploaded to.
-    # bucket = gcs.get_bucket(CLOUD_STORAGE_BUCKET)
-
-    # # Create a new blob and upload the file's content.
-    # blob = bucket.blob(uploaded_file.filename)
-
-    # blob.upload_from_string(
-    #     uploaded_file.read(),
-    #     content_type=uploaded_file.content_type
-    # )
-
-    # # The public URL can be used to directly access the uploaded file via HTTP.
-    # return blob.public_url
-
-# @app.route('/submitted', methods=['POST'])
-# def submitted_form():
-#     # image = request.files['file']
-#     # [END submitted]
-#     # [START render_template]
-#     if request.method == 'POST':
-#         file = request.files['file']
-#         extension = secure_filename(file.filename).rsplit('.', 1)[1]
-#         options = {}
-#         options['retry_params'] = gcs.RetryParams(backoff_factor=1.1)
-#         options['content_type'] = 'image/' + extension
-#         bucket_name = "style-input-images-1"
-#         path = '/' + bucket_name + '/' + str(secure_filename(file.filename))
-#         if file and allowed_file(file.filename):
-#             try:
-#                 with gcs.open(path, 'w', **options) as f:
-#                     f.write(file.stream.read())
-#                     print(jsonify({"success": True}))
-#                 return jsonify({"success": True})
-#             except Exception as e:
-#                 logging.exception(e)
-#                 return jsonify({"success": False})
-#     return render_template('home.html')
-    # [END render_template]
 
 @app.errorhandler(500)
 def server_error(e):
@@ -518,4 +205,4 @@ def server_error(e):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(threaded=True)
