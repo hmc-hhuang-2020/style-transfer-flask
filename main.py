@@ -11,6 +11,7 @@ from mrcnn import utils
 
 from object_detection import load_object, show_selection_outlines, show_selection_crop, show_selection_inverse, InferenceConfig, blending
 from werkzeug.utils import secure_filename
+from six.moves.urllib.request import urlopen
 import tarfile
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
