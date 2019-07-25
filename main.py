@@ -11,7 +11,7 @@ from mrcnn import utils
 
 from object_detection import load_object, show_selection_outlines, show_selection_crop, show_selection_inverse, InferenceConfig, blending
 from werkzeug.utils import secure_filename
-
+import tarfile
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -42,6 +42,26 @@ LOCATION = None
 
 # detection_model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 # detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
+
+def DownloadCheckpointFiles(checkpoint_dir=os.path.abspath("")):
+    """Download checkpoint files if necessary."""
+    url_prefix = 'http://download.magenta.tensorflow.org/models/' 
+    checkpoints = ['arbitrary_style_transfer.tar.gz']
+    path = 'arbitrary_style_transfer'
+    for checkpoint in checkpoints:
+        full_checkpoint = os.path.join(checkpoint_dir, checkpoint)
+        if not os.path.exists(path):
+            print('Downloading {}'.format(full_checkpoint))
+            response = urlopen(url_prefix + checkpoint)
+            data = response.read()
+            with open(full_checkpoint, 'wb') as fh:
+                fh.write(data)
+            unzip_tar_gz()
+
+def unzip_tar_gz():
+    tf = tarfile.open('arbitrary_style_transfer.tar.gz',"r:gz")
+    tf.extractall()
+    tf.close()
 
 
 def upload_to_gcloud(file):
@@ -205,4 +225,5 @@ def server_error(e):
 
 
 if __name__ == '__main__':
+    DownloadCheckpointFiles()    
     app.run(threaded=True)
