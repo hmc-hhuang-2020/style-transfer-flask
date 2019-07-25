@@ -3,6 +3,7 @@ __pycache__/
 
 # JSON key file
 AMLI-8d5ee15d9927.json
+AMLI-91e0eb3d10df.json 
 
 # VSCode files
 .vscode/
@@ -12,4 +13,12 @@ venv/
 
 # Local environment files
 coco/
+mrcnn
+arbitrary_style_transfer/
+outputs/
+
 static/out/
+static/input_images/
+static/style_images/
+static/blending/
+static/final/
