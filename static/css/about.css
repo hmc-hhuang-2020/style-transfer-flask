@@ -1,30 +1,85 @@
-/* Entire page */
 * {
-  font-family: Arial;
+  font-family: Times;
 }
 body {
-  background-color: lightsteelblue;  
+  /*background-color: black;
+  color: white; */ 
+  /*background: url(https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/vJg1nZe/colorful-smoke-on-black-background-real-scene-red-blue_boe2qhfz__F0000.png);*/
+  background-color: black;
+  color: pink;
+  font-size: 18px;
+  /*margin: 10px 50px 50px 50px;*/
+}
+
+/*@-webkit-keyframes mymove {
+  from {background: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);}
+  to {background: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);}
+}
+
+
+@keyframes mymove {
+
+  from {background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+  color:yellow;}
+  to {background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+  color:purple;}
+}*/
+
+p {
+  margin: 10px auto;
+  width: 75%
 }
 
 /* Header */
 h1 {
-  color: black;
+  /*-webkit-animation: mymove 2.5s infinite; 
+  animation: mymove 2.5s infinite;*/
+  background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+
+  color:darkblue;
   text-align: center;
+  font-size: 80px;
   width: 100%;
   /* top horizontal bottom*/
-  margin: 40px auto 0;
+  margin: 20px auto 0;
+}
+
+h2 {
+  margin: 80px auto 0;
+  width: 95%
+}
+
+h3 {
+  margin: 20px auto 0;
+  width: 75%;
+  /*margin: auto 20% auto 0 auto 50%;*/
+  /*right: 10%;*/
+}
+
+li {
+  margin: auto 3.5%;
+  /*width: 30% */
 }
 
 /* Add a black background color to the top navigation */
 .topnav {
-  background-color: #333;
+  background-color: violet;
   overflow: hidden;
 }
 
 /* Style the links inside the navigation bar */
 .topnav a {
   float: left;
-  color: #f2f2f2;
+  color: purple;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -33,12 +88,32 @@ h1 {
 
 /* Change the color of links on hover */
 .topnav a:hover {
-  background-color: #ddd;
-  color: black;
+  background-color: lightpink;
+  color: purple;
 }
 
 /* Add a color to the active/current link */
 .topnav a.active {
-  background-color: steelblue;
-  color: white;
+  background-color: purple;
+  color: lightpink;
+}
+
+.circle {
+  width: 1000px;
+  height: 750px;
+  border-radius: 30%;
+  display: table-cell;
+  /*font-size: 50px;
+  color: white;*/
+  /*line-height: 500px;*/
+  text-align: center;
+  background: purple;
+  vertical-align: middle;
+  top: 50%;
+    left: 50%;
+    margin: auto;
+    -webkit-transform: translateX(15%) translateY(10%);
+    -ms-transform: translateX(15%) translateY(10%);
+    transform: translateX(15%) translateY(10%);
+}
 }

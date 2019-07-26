@@ -93,18 +93,19 @@ h1 {
 }
 
 .button1 {
-  background-color: violet;
-  border: 2px solid purple;
-  border-radius: 50%;
-  color: purple;
+  background-color: purple;
+  border: 2px solid violet;
+  border-radius: 20px;
+  color: pink;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
+  /*margin: 365px 815px;*/
   cursor: pointer;
-  transition-duration: 0.2s;
+  transition-duration: 0.1s;
+  margin: 0% auto 70%;
 }
 
 .button2 {
@@ -117,9 +118,10 @@ h1 {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 365px 815px;
+  /*margin: 365px 815px;*/
   cursor: pointer;
   transition-duration: 0.1s;
+  margin: 33% auto 70%;
 }
 
 .button1:hover {
@@ -142,10 +144,10 @@ color: black;
   border-radius: 10px;
   line-height: 2;
   font-size: 1rem;
-  color: black;
+  color: purple;
 
-  text-shadow: lightcyan;
-  background-color: lightseagreen;
+  text-shadow: pink;
+  background-color: pink;
   background-image: linear-gradient(to top left,
                                       rgba(0, 0, 0, .2),
                                       rgba(0, 0, 0, .2)30%,
@@ -153,8 +155,8 @@ color: black;
   box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
               inset -2px -2px 3px rgba(0, 0, 0, .6);
   display: inline-block;
-}*/
-
+}
+*/
 /*Left Half*/
 #importButton{
   width: 200px;
@@ -179,7 +181,7 @@ color: black;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 0px 2px;
+  margin: 0% auto;
   transition-duration: 0.2s;
   cursor: pointer;
 }
@@ -352,12 +354,6 @@ h4 {
   line-height: 50px;
 }
 
-h5 {
-  margin: 20px auto 0;
-  width: 80%;
-  font-size: 50px;
-}
-
 /* Done button */
 #done {
   position: absolute;
@@ -380,6 +376,13 @@ h3 {
   margin: auto auto auto;
   display: inline-block;
 }
+
+h5 {
+  margin: 20px auto 0;
+  width: 80%;
+  font-size: 50px;
+}
+
 </style>
 
 </head>
@@ -389,7 +392,18 @@ h3 {
         <a class="active" href="file:///C:/Users/Sarah/Desktop/style-transfer-flask/templates/home.html">Home</a>
         <a href="file:///C:/Users/Sarah/Desktop/style-transfer-flask/templates/about.html">About Us</a>
     </div>
+
     <h1>Style Transfer</h1>
-    <h5>Upload Success!</h5>
+    <div class="styleImageClass">
+    <p>Selection Success!</p>
+        <img src="https://images.pexels.com/photos/46710/pexels-photo-46710.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" width="auto" height="auto">
+        <p>Submit to Transfer</p>
+
+        <form method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data" id="form1">
+            <!-- <button type="submit">Submit</button> -->
+        </form>
+        <button class="button1" form="form1" value="Submit">Submit</button>
+    </div>
+
 
 </html>

@@ -1,9 +1,94 @@
 <html>
 
+<script src="https://unpkg.com/jupyter-js-widgets@~1.0.0/dist/embed.js"></script>
+<script type="application/vnd.jupyter-embedded-widgets">
+{
+    "0b2839e97da34d4db1de1e0a58acb485": {
+        "model_name": "LayoutModel",
+        "model_module": "jupyter-js-widgets",
+        "state": {},
+        "views": []
+    },
+    "637439f04a6c45f79ebe95a520abd86e": {
+        "model_name": "IntSliderModel",
+        "model_module": "jupyter-js-widgets",
+        "state": {
+            "layout": "IPY_MODEL_0b2839e97da34d4db1de1e0a58acb485",
+            "description": "Maximum",
+            "max": 200,
+            "min": 100,
+            "value": 100
+        },
+        "views": []
+    },
+    "9f4fdcbc76764609b3095d1681a1a044": {
+        "model_name": "LayoutModel",
+        "model_module": "jupyter-js-widgets",
+        "state": {},
+        "views": []
+    },
+    "b5e0072bfc0246feb7117b83a8fbc94b": {
+        "model_name": "IntSliderModel",
+        "model_module": "jupyter-js-widgets",
+        "state": {
+            "layout": "IPY_MODEL_9f4fdcbc76764609b3095d1681a1a044",
+            "description": "Value",
+            "value": 40
+        },
+        "views": []
+    },
+    "aa4288be316142248e0be51c0bb107aa": {
+        "model_name": "DirectionalLinkModel",
+        "model_module": "jupyter-js-widgets",
+        "state": {
+            "target": [
+                "IPY_MODEL_b5e0072bfc0246feb7117b83a8fbc94b",
+                "max"
+            ],
+            "source": [
+                "IPY_MODEL_637439f04a6c45f79ebe95a520abd86e",
+                "value"
+            ]
+        },
+        "views": []
+    },
+    "b0c77cc378bc4cfca1357e13b049b253": {
+        "model_name": "LayoutModel",
+        "model_module": "jupyter-js-widgets",
+        "state": {
+            "flex_flow": "column",
+            "display": "flex"
+        },
+        "views": []
+    },
+    "bf7d86e0469c4ec8aab2228a438e7120": {
+        "model_name": "BoxModel",
+        "model_module": "jupyter-js-widgets",
+        "state": {
+            "children": [
+                "IPY_MODEL_637439f04a6c45f79ebe95a520abd86e",
+                "IPY_MODEL_b5e0072bfc0246feb7117b83a8fbc94b"
+            ],
+            "layout": "IPY_MODEL_b0c77cc378bc4cfca1357e13b049b253"
+        },
+        "views": [
+            {}
+        ]
+    }
+}
+</script>
+
+
+
+
+
+
+
+
+
 <head>
     <title>Style Transfer</title>
     <link rel="stylesheet" href='/static/css/home.css'>
-
 <style type="text/css">
 * {
   font-family: Times;
@@ -93,18 +178,19 @@ h1 {
 }
 
 .button1 {
-  background-color: violet;
-  border: 2px solid purple;
-  border-radius: 50%;
-  color: purple;
+  background-color: purple;
+  border: 2px solid violet;
+  border-radius: 20px;
+  color: pink;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
+  /*margin: 365px 815px;*/
   cursor: pointer;
-  transition-duration: 0.2s;
+  transition-duration: 0.1s;
+  margin: 0% auto 70%;
 }
 
 .button2 {
@@ -117,9 +203,10 @@ h1 {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 365px 815px;
+  /*margin: 365px 815px;*/
   cursor: pointer;
   transition-duration: 0.1s;
+  margin: 33% 70%;
 }
 
 .button1:hover {
@@ -142,10 +229,10 @@ color: black;
   border-radius: 10px;
   line-height: 2;
   font-size: 1rem;
-  color: black;
+  color: purple;
 
-  text-shadow: lightcyan;
-  background-color: lightseagreen;
+  text-shadow: pink;
+  background-color: pink;
   background-image: linear-gradient(to top left,
                                       rgba(0, 0, 0, .2),
                                       rgba(0, 0, 0, .2)30%,
@@ -153,8 +240,8 @@ color: black;
   box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
               inset -2px -2px 3px rgba(0, 0, 0, .6);
   display: inline-block;
-}*/
-
+}
+*/
 /*Left Half*/
 #importButton{
   width: 200px;
@@ -179,7 +266,7 @@ color: black;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 0px 2px;
+  margin: 0% auto;
   transition-duration: 0.2s;
   cursor: pointer;
 }
@@ -352,12 +439,6 @@ h4 {
   line-height: 50px;
 }
 
-h5 {
-  margin: 20px auto 0;
-  width: 80%;
-  font-size: 50px;
-}
-
 /* Done button */
 #done {
   position: absolute;
@@ -380,6 +461,13 @@ h3 {
   margin: auto auto auto;
   display: inline-block;
 }
+
+h5 {
+  margin: 20px auto 0;
+  width: 80%;
+  font-size: 50px;
+}
+
 </style>
 
 </head>
@@ -390,6 +478,13 @@ h3 {
         <a href="file:///C:/Users/Sarah/Desktop/style-transfer-flask/templates/about.html">About Us</a>
     </div>
     <h1>Style Transfer</h1>
-    <h5>Upload Success!</h5>
-
+    <div class="styleImageClass">
+        <p> Take a look at the final product:</p>
+        <img src="https://images.pexels.com/photos/46710/pexels-photo-46710.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" width="auto" height="auto">
+        <p></p>
+        <form method="GET" action="file:///C:/Users/Sarah/Desktop/style-transfer-flask/templates/home.html" enctype="multipart/form-data" id="form1">
+            <!-- <button type="submit">Submit</button> -->
+        </form>
+        <button class="button1" form="form1" value="Submit">Submit</button>
+    </div>
 </html>

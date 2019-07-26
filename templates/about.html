@@ -3,52 +3,184 @@
 <head>
     <title>About Style Transfer</title>
     <link rel="stylesheet" href="/static/css/about.css">
+
+<style type="text/css">
+
+/* Entire page */
+* {
+  font-family: Times;
+}
+body {
+  /*background-color: black;
+  color: white; */ 
+  /*background: url(https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/vJg1nZe/colorful-smoke-on-black-background-real-scene-red-blue_boe2qhfz__F0000.png);*/
+  background-color: black;
+  color: pink;
+  font-size: 18px;
+  /*margin: 10px 50px 50px 50px;*/
+}
+
+/*@-webkit-keyframes mymove {
+  from {background: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);}
+  to {background: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);}
+}
+
+
+@keyframes mymove {
+
+  from {background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+  color:yellow;}
+  to {background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+  color:purple;}
+}*/
+
+p {
+  margin: 10px auto;
+  width: 75%
+}
+
+/* Header */
+h1 {
+  /*-webkit-animation: mymove 2.5s infinite; 
+  animation: mymove 2.5s infinite;*/
+  background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+
+  color:darkblue;
+  text-align: center;
+  font-size: 80px;
+  width: 100%;
+  /* top horizontal bottom*/
+  margin: 20px auto 0;
+}
+
+h2 {
+  margin: 80px auto 0;
+  width: 95%
+}
+
+h3 {
+  margin: 20px auto 0;
+  width: 75%;
+  /*margin: auto 20% auto 0 auto 50%;*/
+  /*right: 10%;*/
+}
+
+li {
+  margin: auto 3.5%;
+  /*width: 30% */
+}
+
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: violet;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: purple;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: lightpink;
+  color: purple;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: purple;
+  color: lightpink;
+}
+
+.circle {
+	width: 1000px;
+	height: 750px;
+	border-radius: 30%;
+	display: table-cell;
+	/*font-size: 50px;
+	color: white;*/
+	/*line-height: 500px;*/
+	text-align: center;
+	background: purple;
+	vertical-align: middle;
+	top: 50%;
+    left: 50%;
+    margin: auto;
+    -webkit-transform: translateX(15%) translateY(10%);
+    -ms-transform: translateX(15%) translateY(10%);
+    transform: translateX(15%) translateY(10%);
+}
+}
+
+</style>
 </head>
 
 <body>
     <div class="topnav">
         <!-- <a href="home">Home</a>
         <a class="active" href="about">About Us</a> -->
-        <a href="{{ url_for('index') }}">Home</a>
-        <a class=" active" href="{{ url_for('about') }}">About Us</a>
+        <a href="file:///C:/Users/Sarah/Desktop/style-transfer-flask/templates/home.html">Home</a>
+        <a class=" active" href="file:///C:/Users/Sarah/Desktop/style-transfer-flask/templates/about.html">About Us</a>
     </div>
 
 
     <h1>About Style Transfer</h1>
 
+    <div class="circle">
+    	<h3><u>Introduction</u></h3>
+	    <p>
+	        Image style transfer is a subject that has been studied a lot in the past few years.
+	        However, the existing models focus on transferring the whole image to a designated style.
+	        While learning more about machine learning in AMLI, computer vision is one area that we haven’t had enough
+	        chance to explore.
+	        Style transfer is one subject that has the potential to be impactful and useful to a large audience.
+	        With current deployment of some apps, one can apply artistic filters to the photos. We want to
+	        create a web app that interactively offers more style transfer options to users.
+	    </p>
+
+	    <p>
+	        The style transfer web app is designed to process the image style transfer based on two input images- one is the style reference image (extracting the style from this image) and the second one is the image that embeds the style onto itself (creating an artistic effect on the chosen image).
+	    </p>
+
+	    <h3><u>Objective</u></h3>
+	    <p>
+	        The objective of this team is to build a successful web app that not only processes a style transfer onto an image, but also allows the user to select specific objects in the image to process the transfer and other artistic special effects.
+	    </p>
+
+	    <h3><u>Process</u></h3>
+	    <p>
+	        The three main processes are: object detection/classification/segmentation, basic style transfer, and performing style transfer on specific objects. The model trains on the COCO dataset. Since this project idea has been very well studied, using pretrained models is a great approach. The obeject detection uses the RCNN model, and the style transfer uses keras and VGG19 model for image classification. 
+	    </p>
+
+	    <h3><u>Resources</u></h3>
+	    <p>
+	        You can view the resources <a href="https://docs.google.com/document/d/1RQpNrksIgvNnZiEnDHOfc-DgTirKSnKfacfWUN9_pmw/edit?usp=sharing"><font color=violet>here</font></a>.
+	    </p>
+	 </div>
+        
+    <h2><u>Style Transfer Team</u></h2>
     <p>
-        Image style transfer is a subject that has been studied a lot in the past few years.
-        However, the existing models focus on transferring the whole image to a designated style.
-        While learning more about machine learning in AMLI, computer vision is one area that we haven’t had enough
-        chance to explore.
-        Style transfer is one subject that has the potential to be impactful and useful to a large audience.
-        With current deployment of some apps, one can apply artistic filters to the photos. We want to
-        create an web app that interactively offers more style transfer options to users.
-
+        <b><li>Huize Huang</li></b>
+        <b><li>Aaron Alphonsus</li></b>
+        <b><li>Luis Gruber</li></b>
+        <b><li>Michael Hu</li></b>
+        <b><li>Sarah Saleem</li></b>
     </p>
-
-    <h2>About Style Transfer Team</h2>
-    <p>
-        <b>Huize Huang</b>
-    </p>
-
-    <p>
-        <b>Aaron Alphonsus</b>
-    </p>
-
-    <p>
-        <b>Luis Gruber</b>
-    </p>
-
-    <p>
-        <b>Michael Hu</b>
-    </p>
-
-    <p>
-        <b>Sarah Saleem</b>
-    </p>
-
-
 
 </body>
 

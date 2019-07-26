@@ -29,40 +29,10 @@ def about():
     return render_template('about.html')
 
 
-# @app.route("/upload")
-# def upload():
-#     uploadUri = blobstore.create_upload_url(
-#         '/submit', gs_bucket_name=CLOUD_STORAGE_BUCKET)
-#     return render_template('upload.html', uploadUri=uploadUri)
-
-
-# @app.route("/submit", methods=['POST'])
-# def submit():
-#     if request.method == 'POST':
-#         f = request.files['style_file']
-#         header = f.headers['Content-Type']
-#         parsed_header = parse_options_header(header)
-#         blob_key = parsed_header[1]['blob-key']
-#     return blob_key
-
-
-# @app.route("/img/<bkey>")
-# def img(bkey):
-#     blob_info = blobstore.get(bkey)
-#     response = make_response(blob_info.open().read())
-#     response.headers['Content-Type'] = blob_info.content_type
-#     return response
-
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    # style_path = request.files['style_file']
-    # content_path = request.files['image_file']
-    # best, best_loss = run_style_transfer(
-    #     content_path, style_path, num_iterations=500)
-    # Image.fromarray(best)
-    # im = Image.fromarray(best)
-    # styled = im.save('styled.jpg')
+    
     image_file = request.files['image_file']
     model = os.path.join(os.path.abspath(''), 'rcnn_model.pkl')
     show_objects = load_object(image_file, model)

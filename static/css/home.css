@@ -1,15 +1,26 @@
-/* Entire page */
 * {
-  font-family: Arial;
+  font-family: Times;
 }
 body {
-  background-color: lightsteelblue;  
+  /*background-color: black */
+  background-color: black;
+  color: pink;
+  font-size: 18px;
 }
+
 
 /* Header */
 h1 {
-  color: black;
+  /*color: pink;*/
+  /*text-shadow: 2px 2px #ff0000*/
+  background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+
+  color:darkblue;
   text-align: center;
+  font-size: 80px;
   width: 100%;
   /* top horizontal bottom*/
   margin: 20px auto 0;
@@ -17,14 +28,14 @@ h1 {
 
 /* Add a black background color to the top navigation */
 .topnav {
-  background-color: #333;
+  background-color: violet;
   overflow: hidden;
 }
 
 /* Style the links inside the navigation bar */
 .topnav a {
   float: left;
-  color: #f2f2f2;
+  color: purple;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -33,33 +44,37 @@ h1 {
 
 /* Change the color of links on hover */
 .topnav a:hover {
-  background-color: #ddd;
-  color: black;
+  background-color: lightpink;
+  color: purple;
 }
 
 /* Add a color to the active/current link */
 .topnav a.active {
-  background-color: steelblue;
-  color: white;
+  background-color: purple;
+  color: lightpink;
 }
 
 
 .styleImageClass{
   width: 200px;
   height: 100px;
+  color: violet;
   top: 0;
   bottom: 0;
   margin: auto 5% auto 30%;
-  right: 50%;
+  /*right: 50%;*/
+  font-size: 25px
 }
 
 .inputImageClass{
   width: 200px;
   height: 100px;
-  top: 50;
+  color: violet;
+  top: 100;
   bottom: 50;
   margin: auto 5% auto 30%;
   right: 50%;
+  font-size: 25px
 }
 
 
@@ -70,11 +85,53 @@ h1 {
   height: 30%;
 }
 
+.button1 {
+  background-color: violet;
+  border: 2px solid purple;
+  border-radius: 50%;
+  color: purple;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition-duration: 0.2s;
+}
+
+.button2 {
+  background-color: purple;
+  border: 2px solid violet;
+  border-radius: 20px;
+  color: pink;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 365px 815px;
+  cursor: pointer;
+  transition-duration: 0.1s;
+}
+
+.button1:hover {
+background-color: lightpink;
+color: purple;
+}
+
+.button2:hover {
+background-color: violet;
+color: black;
+}
+
+
+
 /* All buttons */
-.button, .dropdown select {
+/*.button, .dropdown select {
   position: absolute;
 
-  border: 0;
+  border: 60;
   border-radius: 10px;
   line-height: 2;
   font-size: 1rem;
@@ -89,7 +146,7 @@ h1 {
   box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
               inset -2px -2px 3px rgba(0, 0, 0, .6);
   display: inline-block;
-}
+}*/
 
 /*Left Half*/
 #importButton{
@@ -100,13 +157,58 @@ h1 {
   margin: auto 5% auto 30%;
   right: 50%;
 }
+
+/*input[type="file"] {
+  display:none;
+}*/
+
+::-webkit-file-upload-button {
+  background-color: violet;
+  border: 2px solid purple;
+  border-radius: 50%;
+  color: purple;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 0px 2px;
+  transition-duration: 0.2s;
+  cursor: pointer;
+}
+
+::-webkit-file-upload-button:hover {
+background-color: lightpink;
+color: purple;
+}
+
+.form-submit-button {
+  background-color: purple;
+  border: 2px solid violet;
+  border-radius: 20px;
+  color: pink;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 50px 200px;
+  cursor: pointer;
+  transition-duration: 0.1s;
+}
+
+.form-submit-button:hover {
+  background-color: violet;
+  color: black;
+}
+
 form, .input-file-container, label {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  width: 70px;
+  height: 20px;
   left: 0;
   right: 0;
-  top: 0;
+  top: 58;
   bottom: 0;
   margin: auto;
   font-size: 25px;
@@ -129,6 +231,7 @@ form, .input-file-container, label {
   padding: 14px 0;
   cursor: pointer;
 }
+
 .file-return {
   margin: 0;
 }
@@ -265,4 +368,8 @@ h3 {
   display: inline-block;
 }
 
-  
+h5 {
+  margin: 20px auto 0;
+  width: 80%;
+  font-size: 50px;
+}
