@@ -3,16 +3,49 @@
   font-family: Arial;
 }
 body {
-  background-color: lightsteelblue;  
+  position: relative;
+  background-color: rgb(231, 231, 231);
+  color: rgb(41, 41, 41);
+  font-size: 18px;
+  /* background-color: lightsteelblue;   */
 }
 
-/* Header */
 h1 {
-  color: black;
+  /*color: pink;*/
+  /*text-shadow: 2px 2px #ff0000*/
+  background-image: url(https://ml4a.github.io/images/headers/monalisa_stylenet.jpg);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+  opacity: 0.7; 
+  color:black;
   text-align: center;
-  width: 100%;
+  font-size: 80px;
+  width: 90%;
   /* top horizontal bottom*/
-  margin: 20px auto 0;
+  margin: 10px auto 0;
+  overflow: hidden;
+}
+
+p{
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  color: rgb(74, 76, 77);
+  font-size: 25px
+}
+
+/* input{
+  background-color: white;
+  color: rgb(74, 76, 77);
+  width:200px;
+  font-size: 20px;
+} */
+.center-block {
+  margin: auto;
+  display: block;
+  /* margin-right: auto;
+  margin-left: auto; */
 }
 
 /* Add a black background color to the top navigation */
@@ -39,22 +72,29 @@ h1 {
 
 /* Add a color to the active/current link */
 .topnav a.active {
-  background-color: steelblue;
+  background-color: rgb(87, 118, 143);
   color: white;
 }
 
 .center {
+  text-align: center;
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* margin: auto;
   display: table-cell;
-  margin-left: auto;
-  margin-right: auto;
-  height: 600px;;
+  width: 400px;
+  /* vertical-align: middle; */
+  /* align-content: center; */
+  /* margin-left: auto;
+  margin-right: auto; */
+  /* height: 200px;; */
 }
 
 .verticalcenter {
   margin-left: auto;
   margin-right: auto;
   display: table-cell;
-  height: 400px;
+  height: 240px;
 }
 
 .verticalcenter_crop {
@@ -65,46 +105,85 @@ h1 {
   height: 200px;
 }
 
+p{
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  color: rgb(74, 76, 77);
+  font-size: 25px
+}
 
-.objectClass{
-  width: 200px;
-  height: 100px;
-  top: 0;
-  bottom: 0;
-  margin: auto 0 auto 0;
-  right: 20%;
-  align: middle;
+/* .inputTextButton{
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: row;
+  width:400px;
+  margin: 5px 10px 5px 0;
+} */
+
+/* .inputTextButton{
+  margin: auto auto;
+  background-color: white;
+  vertical-align: middle;
+  padding: 10px;
+  color: rgb(74, 76, 77);
+  width:250px;
+  font-size: 20px;
+  /* top:400px; */
+  /* margin: 5px 10px 5px 0;
+} */
+.showImageClass{
+  margin-left: auto;
+  margin-right: auto;
+  display: table-cell;
+  height: 400px;
+  padding: 20px;
 }
 
 .styleImageClass{
   width: 200px;
   height: 100px;
+  color: rgb(74, 76, 77);
   top: 0;
   bottom: 0;
   margin: auto 5% auto 30%;
-  right: 50%;
+  font-size: 25px
 }
-
 .inputImageClass{
   width: 200px;
   height: 100px;
-  top: 50;
+  color: rgb(74, 76, 77);
+  top: 100;
   bottom: 50;
   margin: auto 5% auto 30%;
   right: 50%;
+  font-size: 25px
 }
 
-.buttonClass{
-  width: 200px;
-  height: 100px;
-  top: 50;
-  bottom: 50;
-  margin: auto 5% auto 30%;
-  right: 50%;
+
+.button2 {
+  background-color: #373839;
+  border: 2px solid #46494A;
+  border-radius: 20px;
+  color: #C4C6C7;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  /* margin: auto 50 auto 0; */
+  margin: 365px 500px;
+  cursor: pointer;
+  transition-duration: 0.1s;
+}
+
+.button2:hover {
+  background-color: #C4C6C7;
+  color: black;
 }
 
 /* Body */
-#photoButtonsDiv {
+#ButtonsDiv {
   position: absolute;
   width: 90%;
   height: 30%;
@@ -140,169 +219,89 @@ h1 {
   margin: auto 5% auto 30%;
   right: 50%;
 }
-form, .input-file-container, label {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  font-size: 25px;
+
+::-webkit-file-upload-button {
+  background-color: #333;
+  border: 2px solid #455054;
+  border-radius: 50%;
+  color: white;
+  padding: 15px 32px;
   text-align: center;
-} 
-.js .input-file-trigger {
-  display: block;
-  width: 90px;
-  height: 150px;
-  padding: 14px 45px;
-  background: transparent;
-  transition: all .4s;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 0px 2px;
+  transition-duration: 0.2s;
   cursor: pointer;
 }
-.js .input-file {
-  position: absolute;
-  top: 0; left: 0;
-  width: 225px;
-  opacity: 0;
-  padding: 14px 0;
-  cursor: pointer;
+::-webkit-file-upload-button:hover {
+background-color: #C4C6C7;
+color:black;
 }
-.file-return {
-  margin: 0;
-}
-.file-return:not(:empty) {
-  margin: 1em 0;
-}
-.js .file-return {
-  font-style: italic;
-  font-size: .9em;
-  font-weight: bold;
-}
-.js .file-return:not(:empty):before {
-  content: "Selected file: ";
-  font-style: normal;
-  font-weight: normal;
-}
-.icon {
-  position: absolute;
-  width: 50px;
-  height: auto;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto auto 25px;
-}
-
-
-/* Right Half */
-#right{
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  top: 0;
-  bottom: 0;
-  margin: auto 30% auto 5%;
-  left: 50%;
-}
-
-/* Dropdown category */
-#dropdown {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: auto;
-  margin: 0 auto auto;
-}
-.square {
-  width: 200px;
-  height: 50px;
-  margin: 0;
-  display: inline-block;
-}
-.dropdown {
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
-  width: 200px;
-  height: 50px;
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 auto auto;
-}
-.dropdown select {
-  width: 200px;
-  height: 50px;
-  padding: .5em;
-  padding-right: 2.5em; 
-  border: 0;
-  margin: 0;
-  text-indent: 0.01px;
-  text-overflow: '';
-  -webkit-appearance: button; /* hide default arrow in chrome OSX */
-}
-.dropdown::before,
-.dropdown::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-.dropdown::after { /*  Custom dropdown arrow */
-  content: "\25BC";
-  height: 50px;
-  font-size: .625em;
-  line-height: 1;
-  right: 1.2em;
-  top: 50%;
-  margin-top: -.5em;
-}
-.dropdown::before { /*  Custom dropdown arrow cover */
-  width: 200px;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  border-radius: 0 3px 3px 0;
-}
-
-/* No photo error */
-h4 {
-  color: red;
-  font-size: 20px;
-  position: absolute;
-  width: 100%;
-  height: 50px;
-  bottom: 50%;
-  transform: translateY(50%);
-  margin: auto;
+.form-submit-button {
+  background-color: #333;
+  border: 2px solid #455054;
+  border-radius: 20px;
+  color: white;
+  padding: 15px 32px;
   text-align: center;
-  line-height: 50px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  /* margin: 50px 200px; */
+  cursor: pointer;
+  transition-duration: 0.1s;
+  margin: 5px 10px 5px 10px;
 }
-
-/* Done button */
-#done {
-  position: absolute;
-  width: 200px;
-  height: 50px;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: auto;
-  margin: auto auto 0;
-}
-h3 {
+.form-submit-button:hover {
+  background-color: #C4C6C7;
   color: black;
-  text-align: center;
-  font-size: 20px;
-  left: 0;
-  right: 0;
-  top: 0;
-  margin: auto auto auto;
-  display: inline-block;
 }
 
-  
+.textButtonForm {
+  display: table-cell; 
+  flex-direction: row;
+  text-align: center;
+}
+
+.form-inline { 
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  margin: auto auto;
+  width: 400px;
+}
+
+.form-inline input{
+  background-color: white;
+  vertical-align: middle;
+  padding: 10px;
+  color: rgb(74, 76, 77);
+  width:250px;
+  font-size: 20px;
+  /* top:400px; */
+  margin: 5px 10px 5px 0;
+}
+
+/* Style the submit button */
+.form-inline button {
+  background-color: #333;
+  border: 2px solid #455054;
+  border-radius: 20px;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  /* margin: 50px 200px; */
+  cursor: pointer;
+  transition-duration: 0.1s;
+  margin: 5px 10px 5px 0;
+}
+
+.form-inline button:hover {
+  background-color: #C4C6C7;
+  color: black;
+}
+

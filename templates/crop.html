@@ -11,13 +11,12 @@
         <a href="{{ url_for('about') }}">About Us</a>
     </div>
     <h1>Style Transfer</h1>
-    <div class="styleImageClass">
-        <form method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data">
-            <p> Selection Success, Submit to Transfer</p>
-            <button type="submit">Submit</button>
-            <img src="{{image_url}}" width="auto" height="auto" class="vertiverticalcenter_cropcalcenter">
-        </form>
-    </div>
-
+    <p> Selection Success, Submit to Transfer</p>
+    <form method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data">
+        <button type="submit" class="form-submit-button">Submit</button>
+    </form>
+    <p></p>
+    <img src="{{image_url}}" width="auto" height="auto" class="showImageClass">
+</body>
 
 </html>

@@ -161,8 +161,8 @@ def show_selection_outlines(raw_input, image, r):
 
     masked_image = image.astype(np.uint32).copy()
     contour_outlines = []
-    if raw_input == 1000:
-        raw_input = range(len(r['rois']))
+    if raw_input == [1000]:
+        raw_input = list(range(len(r['rois'])))
     for i in raw_input:
         if i > len(r['rois']) or i < 0:
             continue
@@ -192,18 +192,13 @@ def show_selection_crop(raw_input, image, r):
     _, ax = plt.subplots(1, figsize=figsize)
     ax.axis('off')
     ax.margins(0, 0)
-    color = (.2, 0.5, 0.9)
-    contour_outlines = []
     background_image = np.zeros_like(image)
-    # background_image[:, :, ] = [0, 0, 0]
     masked_image = image.astype(np.uint32).copy()
-    contour_outlines = []
-    if raw_input == 1000:
-        raw_input = range(len(r['rois']))
+    if raw_input == [1000]:
+        raw_input = list(range(len(r['rois'])))
     for i in raw_input:
         if i > len(r['rois']) or i < 0:
             continue
-        y1, x1, y2, x2 = r['rois'][i]
         mask = r['masks'][:, :, i]
         background_image = apply_mask_image(
             background_image, masked_image, mask,)
@@ -225,13 +220,10 @@ def show_selection_inverse(raw_input, image, r):
 
     ax.axis('off')
     ax.margins(0, 0)
-    color = (.2, 0.5, 0.9)
-    contour_outlines = []
     background_image = np.zeros_like(image)
     masked_image = image.astype(np.uint32).copy()
-    contour_outlines = []
-    if raw_input == 1000:
-        raw_input = range(len(r['rois']))
+    if raw_input == [1000]:
+        raw_input = list(range(len(r['rois'])))
     for i in raw_input:
         if i > len(r['rois']) or i < 0:
             continue

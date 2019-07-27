@@ -26,23 +26,23 @@ SHOW_OBJECTS = None
 
 STYLE_URL = None
 
-DETECT_URL = None
-
-FINAL_URL = None
-
 CONTENT_URL = None
 
 LOCATION = None
+SELECTION = None
 
-# ROOT_DIR = os.path.abspath("")
-# MaskRCNN_DIR = os.path.abspath("Mask_RCNN")
-# MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
-# COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+ROOT_DIR = os.path.abspath("")
+MaskRCNN_DIR = ROOT_DIR
 
-# config = InferenceConfig()
+MODEL_DIR = os.path.join(MaskRCNN_DIR, "coco.py")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+if not os.path.exists(COCO_MODEL_PATH):
+    utils.download_trained_weights(COCO_MODEL_PATH)
 
-# detection_model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
-# detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
+config = InferenceConfig()
+detection_model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
+detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
+detection_model.keras_model._make_predict_function()
 
 def DownloadCheckpointFiles(checkpoint_dir=os.path.abspath("")):
     """Download checkpoint files if necessary."""
@@ -66,7 +66,6 @@ def unzip_tar_gz():
 
 
 def upload_to_gcloud(file):
-    # style_path = request.files['style_file']
     storage_client = storage.Client(project='amli-245518')
     bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
     blob = bucket.blob(file.filename)
@@ -75,7 +74,6 @@ def upload_to_gcloud(file):
 
 
 def upload_to_gcloud_name(file, destination_blob_name):
-    # style_path = request.files['style_file']
     storage_client = storage.Client(project='amli-245518')
     bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
     blob = bucket.blob(destination_blob_name)
@@ -84,13 +82,11 @@ def upload_to_gcloud_name(file, destination_blob_name):
 
 
 def download_from_gcloud(filename):
-    # style_file = os.path.abspath('../Flask-STWA/stylize.jpg')
     client = storage.Client()
     bucket = client.get_bucket(CLOUD_STORAGE_BUCKET)
     blob = bucket.blob(filename)
     temp = 'static/out/'+filename
     blob.download_to_filename(temp)
-    # return send_file(temp.name, attachment_filename=style_file)
     return temp
 
 
@@ -116,6 +112,10 @@ def test():
 @app.route('/upload', methods=['POST'])
 def upload():
     transfer_option = request.form.get('transfer_select')
+    global STYLE_URL, CONTENT_URL
+    global RESULTS, SHOW_OBJECTS
+    global LOCATION
+    global SELECTION
     if transfer_option == 'whole':
         style = request.files['style_file']
         style_name = secure_filename(style.filename)
@@ -134,9 +134,9 @@ def upload():
         --output_dir=static/out \
         --style_images_paths="+style_path+"\
         --content_images_paths="+content_path+"\
-        --image_size=256 \
+        --image_size=512 \
         --content_square_crop=False \
-        --style_image_size=256 \
+        --style_image_size=512 \
         --style_square_crop=False \
         --logtostderr"
         os.system(test)
@@ -145,7 +145,7 @@ def upload():
         return render_template('upload.html', image_url=path)
     elif transfer_option == 'object':
         # # Upload style image first
-        global STYLE_URL, CONTENT_URL
+        SELECTION = 'object'
         style = request.files['style_file']
         style_name = secure_filename(style.filename)
         style_path = os.path.join('static/style_images', style_name)
@@ -157,40 +157,42 @@ def upload():
         content.save(content_path)
         CONTENT_URL = content_path
 
-        ROOT_DIR = os.path.abspath("")
-        MaskRCNN_DIR = ROOT_DIR
+        RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
+        return render_template('object.html', image_url=SHOW_OBJECTS)
+    elif transfer_option == 'inverse':
+        SELECTION = 'inverse'
+        # # Upload style image first
+        style = request.files['style_file']
+        style_name = secure_filename(style.filename)
+        style_path = os.path.join('static/style_images', style_name)
+        style.save(style_path)
+        STYLE_URL = style_path
+        content = request.files['image_file']
+        content_name = secure_filename(content.filename)
+        content_path = os.path.join('static/input_images', content_name)
+        content.save(content_path)
+        CONTENT_URL = content_path
 
-        MODEL_DIR = os.path.join(MaskRCNN_DIR, "coco.py")
-        COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-        if not os.path.exists(COCO_MODEL_PATH):
-            utils.download_trained_weights(COCO_MODEL_PATH)
-
-        config = InferenceConfig()
-
-        detection_model = modellib.MaskRCNN(
-            mode="inference", model_dir=MODEL_DIR, config=config)
-        detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
-
-        global RESULTS
-        global SHOW_OBJECTS
         RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
         return render_template('object.html', image_url=SHOW_OBJECTS)
 
 
 @app.route("/select", methods=['POST'])
 def select():
+    global LOCATION
     selection = request.form.get('chosen_objects')
     selection = [int(x) for x in " ".join(selection.split(",")).split()]
-
     contour_outlines = show_selection_outlines(
         selection, CONTENT_URL, RESULTS)
-
-    location, background_image = show_selection_crop(
-        selection, CONTENT_URL, RESULTS)
-    global LOCATION
-    LOCATION = location
+    if SELECTION == 'object':
+        location, background_image = show_selection_crop(
+            selection, CONTENT_URL, RESULTS)
+        # global LOCATION
+        LOCATION = location
+    elif SELECTION == 'inverse':
+        location, background_image = show_selection_inverse(selection, CONTENT_URL, RESULTS)
+        LOCATION = location
     return render_template('crop.html', image_url=contour_outlines)
-
 
 @app.route("/transform", methods=['POST'])
 def transform():
@@ -202,9 +204,9 @@ def transform():
         --output_dir=static/final \
         --style_images_paths="+STYLE_URL+"\
         --content_images_paths="+LOCATION+"\
-        --image_size=256 \
+        --image_size=512 \
         --content_square_crop=False \
-        --style_image_size=256 \
+        --style_image_size=512 \
         --style_square_crop=False \
         --logtostderr"
     os.system(test)
