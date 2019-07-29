@@ -166,7 +166,6 @@ def show_selection_outlines(raw_input, image, r):
     for i in raw_input:
         if i > len(r['rois']) or i < 0:
             continue
-        y1, x1, y2, x2 = r['rois'][i]
         mask = r['masks'][:, :, i]
         padded_mask = np.zeros(
             (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)

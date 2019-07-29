@@ -12,10 +12,12 @@
     </div>
     <h1>Style Transfer</h1>
     <p> Selection Success, Submit to Transfer</p>
-    <form method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data">
+    <p>Please select transfer option:</p>
+    <form class="form-inline-radio" method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data">
+        <input type="radio" name="scale" value="no"> Direct Transformation<br>
+        <input type="radio" name="scale" value="yes"> Transformation Adjustments<br>
         <button type="submit" class="form-submit-button">Submit</button>
     </form>
-    <p></p>
     <img src="{{image_url}}" width="auto" height="auto" class="showImageClass">
 </body>
 

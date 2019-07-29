@@ -93,7 +93,6 @@ def download_from_gcloud(filename):
 def allowed_file(filename):
     return('.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS)
 
-
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -106,7 +105,7 @@ def about():
 
 @app.route('/test')
 def test():
-    return render_template('object.html')
+    return render_template('crop.html')
 
 
 @app.route('/upload', methods=['POST'])
@@ -196,24 +195,56 @@ def select():
 
 @app.route("/transform", methods=['POST'])
 def transform():
+    scale_option = request.form.get('scale')
     content_img_name = os.path.basename(LOCATION)[:-4]
     style_img_name = os.path.basename(STYLE_URL)[:-4]
+    if scale_option == 'no':
+        output = "arbitrary_image_stylization_with_weights \
+            --checkpoint=arbitrary_style_transfer/model.ckpt \
+            --output_dir=static/final \
+            --style_images_paths="+STYLE_URL+"\
+            --content_images_paths="+LOCATION+"\
+            --image_size=512 \
+            --content_square_crop=False \
+            --style_image_size=512 \
+            --style_square_crop=False \
+            --logtostderr"
+        os.system(output)
+        changed_path = 'static/final/' + ('%s_stylized_%s_0.jpg' %
+                                        (content_img_name, style_img_name))
+        output_str = blending(LOCATION, CONTENT_URL, changed_path)
+        return render_template('final.html', image_url=output_str)
+    elif scale_option == 'yes':
+        INTERPOLATION_WEIGHTS='[0.2,0.4,0.6,0.8,1.0]'
+        outputs = "arbitrary_image_stylization_with_weights \
+            --checkpoint=arbitrary_style_transfer/model.ckpt \
+            --output_dir=static/final \
+            --style_images_paths="+STYLE_URL+"\
+            --content_images_paths="+LOCATION+"\
+            --image_size=512 \
+            --content_square_crop=False \
+            --style_image_size=512 \
+            --style_square_crop=False \
+            --interpolation_weights="+INTERPOLATION_WEIGHTS+"\
+            --logtostderr"
+        os.system(outputs)
+        changed_paths = []
+        for i in range(5):
+            changed_paths.append('static/final/' + ('%s_stylized_%s_%d.jpg' %
+                                        (content_img_name, style_img_name,i)))                                                         
+        return render_template('options.html',image_url=changed_paths)
 
-    test = "arbitrary_image_stylization_with_weights \
-        --checkpoint=arbitrary_style_transfer/model.ckpt \
-        --output_dir=static/final \
-        --style_images_paths="+STYLE_URL+"\
-        --content_images_paths="+LOCATION+"\
-        --image_size=512 \
-        --content_square_crop=False \
-        --style_image_size=512 \
-        --style_square_crop=False \
-        --logtostderr"
-    os.system(test)
-    changed_path = 'static/final/' + ('%s_stylized_%s_0.jpg' %
-                                      (content_img_name, style_img_name))
-    output_str = blending(LOCATION, CONTENT_URL, changed_path)
-    return render_template('final.html', image_url=output_str)
+@app.route("/blend", methods=['POST'])
+def blend():
+    content_img_name = os.path.basename(LOCATION)[:-4]
+    style_img_name = os.path.basename(STYLE_URL)[:-4]
+    select_number = request.form.get('weightScale')
+    changed_path_select = 'static/final/' + ('%s_stylized_%s_%s.jpg' %
+                                        (content_img_name, style_img_name,select_number))
+    print(changed_path_select)     
+    output_str_select = blending(LOCATION, CONTENT_URL, changed_path_select)
+    print(output_str_select)
+    return render_template('final.html',image_url=output_str_select)
 
 
 @app.route("/download", methods=['GET'])
