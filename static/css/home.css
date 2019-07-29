@@ -113,25 +113,13 @@ p{
   font-size: 25px
 }
 
-/* .inputTextButton{
+.inputTextButton{
   margin-left: auto;
   margin-right: auto;
   flex-direction: row;
   width:400px;
-  margin: 5px 10px 5px 0;
-} */
+}
 
-/* .inputTextButton{
-  margin: auto auto;
-  background-color: white;
-  vertical-align: middle;
-  padding: 10px;
-  color: rgb(74, 76, 77);
-  width:250px;
-  font-size: 20px;
-  /* top:400px; */
-  /* margin: 5px 10px 5px 0;
-} */
 .showImageClass{
   margin-left: auto;
   margin-right: auto;
@@ -141,22 +129,29 @@ p{
 }
 
 .styleImageClass{
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  position: relative;
   width: 200px;
   height: 100px;
   color: rgb(74, 76, 77);
   top: 0;
   bottom: 0;
-  margin: auto 5% auto 30%;
+  /* margin: auto 5% auto 30%; */
   font-size: 25px
 }
 .inputImageClass{
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
   width: 200px;
   height: 100px;
   color: rgb(74, 76, 77);
-  top: 100;
-  bottom: 50;
-  margin: auto 5% auto 30%;
-  right: 50%;
+  top: 0;
+  bottom:0;
+  /* margin: auto 5% auto 30%; */
+  /* right: 50%; */
   font-size: 25px
 }
 
@@ -251,7 +246,6 @@ color:black;
   /* margin: 50px 200px; */
   cursor: pointer;
   transition-duration: 0.1s;
-  margin: 5px 10px 5px 10px;
 }
 .form-submit-button:hover {
   background-color: #C4C6C7;
@@ -305,3 +299,72 @@ color:black;
   color: black;
 }
 
+/*the container must be positioned relative:*/
+.custom-select {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  position: relative;
+  font-family: Arial;
+}
+
+.custom-select select {
+  display: none; /*hide original SELECT element:*/
+}
+
+.select-selected {
+  background-color: #333;
+}
+
+/*style the arrow inside the select element:*/
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 2px solid #455054;
+}
+
+/*point the arrow upwards when the select box is open (active):*/
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+
+/*style the items (options), including the selected item:*/
+.select-items div {
+  color: black;
+  padding: 8px 16px;
+  border: 2px solid #455054;
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-selected{
+  color: white;
+  padding: 8px 16px;
+  border: 2px solid #455054;
+  cursor: pointer;
+  user-select: none;
+}
+/*style items (options):*/
+.select-items {
+  position: absolute;
+  background-color: #373839;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+/*hide the items when the select box is closed:*/
+.select-hide {
+  display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+  background-color: #C4C6C7;
+  color:black;
+}

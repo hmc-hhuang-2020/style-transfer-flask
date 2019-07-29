@@ -1,0 +1,23 @@
+<html>
+
+<head>
+    <title>Style Transfer</title>
+    <link rel="stylesheet" href='/static/css/home.css'>
+</head>
+
+<body>
+    <div class="topnav">
+        <a class="active" href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('about') }}">About Us</a>
+    </div>
+    <h1>Style Transfer</h1>
+    <p> Enter the object you want to choose:</p>
+    <form class="form-inline" method="POST" action="{{ url_for('select') }}" enctype="multipart/form-data">
+        <input type="text" name="chosen_objects">     
+    </form>
+    <p> </p>
+    <img src="../static/out/selected_c355fa2925.jpg" width="auto" height="auto" class="showImageClass">
+    <!-- <img src="{{image_url}}" width="auto" height="auto" class="showImageClass"> -->
+</body>
+
+</html>
