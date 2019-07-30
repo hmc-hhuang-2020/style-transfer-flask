@@ -35,7 +35,7 @@ In order to host and run the web application, follow these steps:
 6. In the case of the third and forth options, pick objects by inputing a comma or space separated list of numbers. Each number corresponds to the label number appeared at th beginning of the detected captions. Enter 1000 to select all detected objects. 
 
 ## Demo Video
-* [Link to the Video](https://drive.google.com/file/d/1tLlLgQZDAoCzGuWS2bbrsWkhSEhGT-vX/view?usp=sharing)
+* [Whole functionalities Demo](https://drive.google.com/file/d/1tLlLgQZDAoCzGuWS2bbrsWkhSEhGT-vX/view?usp=sharing)
 
 ## Resources
 * [Magenta](https://github.com/tensorflow/magenta)
