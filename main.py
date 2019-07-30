@@ -41,7 +41,7 @@ detection_model.load_weights(COCO_MODEL_PATH, by_name=True)
 detection_model.keras_model._make_predict_function()
 
 def DownloadCheckpointFiles(checkpoint_dir=os.path.abspath("")):
-    """Download checkpoint files if necessary."""
+    """Download checkpoint files if necessary """
     url_prefix = 'http://download.magenta.tensorflow.org/models/' 
     checkpoints = ['arbitrary_style_transfer.tar.gz']
     path = 'arbitrary_style_transfer'
@@ -56,11 +56,14 @@ def DownloadCheckpointFiles(checkpoint_dir=os.path.abspath("")):
             unzip_tar_gz()
 
 def unzip_tar_gz():
+    """Upzip checkpoint files """
     tf = tarfile.open('arbitrary_style_transfer.tar.gz',"r:gz")
     tf.extractall()
     tf.close()
 
 def upload_style_content_images(style,content):
+    """ Upload style image to style_images folder 
+    and content image to input_images folder """
     style_name = secure_filename(style.filename)
     style_path = os.path.join('static/style_images', style_name)
     style.save(style_path)
@@ -80,6 +83,7 @@ def about():
 @app.route('/upload', methods=['POST'])
 def upload():
     transfer_option = request.form.get('transfer_select')
+    # Set global variable to access across different pages 
     global STYLE_URL, CONTENT_URL
     global RESULTS, SHOW_OBJECTS
     global LOCATION
@@ -92,7 +96,9 @@ def upload():
 
         content_img_name = os.path.basename(CONTENT_URL)[:-4]
         style_img_name = os.path.basename(STYLE_URL)[:-4]
-        test = "arbitrary_image_stylization_with_weights \
+
+        # Run 100% style transfer with arbitrary_image_stylization model
+        out = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
         --output_dir=static/final \
         --style_images_paths="+STYLE_URL+"\
@@ -102,7 +108,7 @@ def upload():
         --style_image_size=512 \
         --style_square_crop=False \
         --logtostderr"
-        os.system(test)
+        os.system(out)
         path = 'static/final/'+('%s_stylized_%s_0.jpg' %
                               (content_img_name, style_img_name))
         return render_template('upload.html', image_url=path)
@@ -115,6 +121,7 @@ def upload():
         content_img_name = os.path.basename(CONTENT_URL)[:-4]
         style_img_name = os.path.basename(STYLE_URL)[:-4]
 
+        # Run different weights of style transfer from 20% to 100%
         INTERPOLATION_WEIGHTS='[0.2,0.4,0.6,0.8,1.0]'
         output = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
@@ -140,6 +147,7 @@ def upload():
         content = request.files['image_file']
         STYLE_URL, CONTENT_URL = upload_style_content_images(style,content)
 
+        # Run Object Detection
         RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
         return render_template('object.html', image_url=SHOW_OBJECTS)
     # Inverse Object Detection
@@ -149,6 +157,7 @@ def upload():
         content = request.files['image_file']
         STYLE_URL, CONTENT_URL = upload_style_content_images(style,content)
 
+        # Run Object Detection
         RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
         return render_template('object.html', image_url=SHOW_OBJECTS)
 
@@ -177,7 +186,7 @@ def transform():
     scale_option = request.form.get('scale')
     content_img_name = os.path.basename(LOCATION)[:-4]
     style_img_name = os.path.basename(STYLE_URL)[:-4]
-    # Direct Transformation 
+    # Direct Transformation with 100% style transfer
     if scale_option == 'no':
         output = "arbitrary_image_stylization_with_weights \
             --checkpoint=arbitrary_style_transfer/model.ckpt \
@@ -194,7 +203,7 @@ def transform():
                                         (content_img_name, style_img_name))
         output_str = blending(LOCATION, CONTENT_URL, changed_path)
         return render_template('final.html', image_url=output_str)
-    # Transformation adjustable
+    # Transformation adjustable from 20% to 100% weights
     elif scale_option == 'yes':
         INTERPOLATION_WEIGHTS='[0.2,0.4,0.6,0.8,1.0]'
         outputs = "arbitrary_image_stylization_with_weights \
@@ -217,14 +226,13 @@ def transform():
 
 @app.route("/blend", methods=['POST'])
 def blend():
+    # Blend the transformed cropped image with original image
     content_img_name = os.path.basename(LOCATION)[:-4]
     style_img_name = os.path.basename(STYLE_URL)[:-4]
     select_number = request.form.get('weightScale')
     changed_path_select = 'static/final/' + ('%s_stylized_%s_%s.jpg' %
                                         (content_img_name, style_img_name,select_number))
-    print(changed_path_select)     
     output_str_select = blending(LOCATION, CONTENT_URL, changed_path_select)
-    print(output_str_select)
     return render_template('final.html',image_url=output_str_select)
 
 
