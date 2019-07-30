@@ -1,6 +1,6 @@
 # Localized Style Transfer
 
-Localized Style Transfer is an application that performs style transfer while allowing the user control over which portion of the image the style transfer gets applied to. The user provides two images: a **style image** to emulate and a **content image** to apply the style to. The application provides the user with a list of objects detected to create a mask and control where the style transfer gets applied to, leaving the rest of the image intact.
+Localized Style Transfer is an application that performs style transfer while allowing the user control over which portion of the image the style transfer gets applied to. The user provides two images: a **style image** to emulate and a **content image** to apply the style to. The Flask web application provides the user with a list of objects detected to create a mask and control where the style transfer gets applied to, leaving the rest of the image intact.
 
 ## Installation
 
