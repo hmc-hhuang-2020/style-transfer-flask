@@ -12,9 +12,11 @@ In order to host and run the web application, follow these steps:
 5. Install dependencies from `requirements.txt`: `pip install -r requirements.txt`
 6. To install dependencies needed to access MS COCO:
 
-   On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI` (Try pip3 if that didn't work)
+   On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI` 
    
    On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
+   
+   *Try `pip3 install git+https://github.com/waleedka/coco.git#subdirectory=PythonAPI` if experiencing errors with above lines.
    
    
 7. Run `pip install magenta` to install magenta machine learning packages. 
