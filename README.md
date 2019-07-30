@@ -4,7 +4,7 @@ Localized Style Transfer is an application that performs style transfer while al
 
 ## Installation
 
-In order to host and run the web application, follow these steps:
+In order to host and run the web application on local machines, follow these steps:
 1. Clone the repository.
 2. For Ubuntu, install `libasound2-dev`: `sudo apt-get install libasound2-dev`
 3. Create a virtual environment to install dependencies: `python3 -m venv path/to/my_venv`
