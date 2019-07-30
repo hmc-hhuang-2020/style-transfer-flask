@@ -11,6 +11,7 @@ In order to host and run the web application, follow these steps:
 4. Activate the virtual enviroment created: `source activate` 
 5. Install dependencies from `requirements.txt`: `pip install -r requirements.txt`
 6. Run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI` to install dependencies needed to access MS COCO.
+7. Run `pip install magenta` to install magenta machine learning packages. 
 
 ## Usage
 
