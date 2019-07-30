@@ -4,7 +4,6 @@ import sys
 import time
 from flask import (Flask, flash, make_response, redirect, render_template,
                    request, send_file, session, url_for)
-from google.cloud import storage
 from PIL import Image
 import mrcnn.model as modellib
 from mrcnn import utils
@@ -14,11 +13,8 @@ from werkzeug.utils import secure_filename
 from six.moves.urllib.request import urlopen
 import tarfile
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
-
-CLOUD_STORAGE_BUCKET = 'style-input-images-1'
 
 RESULTS = None
 
@@ -64,34 +60,14 @@ def unzip_tar_gz():
     tf.extractall()
     tf.close()
 
-
-def upload_to_gcloud(file):
-    storage_client = storage.Client(project='amli-245518')
-    bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
-    blob = bucket.blob(file.filename)
-    blob.upload_from_file(file)
-    return blob.public_url
-
-
-def upload_to_gcloud_name(file, destination_blob_name):
-    storage_client = storage.Client(project='amli-245518')
-    bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename(file)
-    return blob.public_url
-
-
-def download_from_gcloud(filename):
-    client = storage.Client()
-    bucket = client.get_bucket(CLOUD_STORAGE_BUCKET)
-    blob = bucket.blob(filename)
-    temp = 'static/out/'+filename
-    blob.download_to_filename(temp)
-    return temp
-
-
-def allowed_file(filename):
-    return('.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS)
+def upload_style_content_images(style,content):
+    style_name = secure_filename(style.filename)
+    style_path = os.path.join('static/style_images', style_name)
+    style.save(style_path)
+    content_name = secure_filename(content.filename)
+    content_path = os.path.join('static/input_images', content_name)
+    content.save(content_path)
+    return style_path, content_path
 
 @app.route('/')
 def index():
@@ -102,12 +78,6 @@ def index():
 def about():
     return render_template('about.html')
 
-
-@app.route('/test')
-def test():
-    return render_template('crop.html')
-
-
 @app.route('/upload', methods=['POST'])
 def upload():
     transfer_option = request.form.get('transfer_select')
@@ -115,62 +85,70 @@ def upload():
     global RESULTS, SHOW_OBJECTS
     global LOCATION
     global SELECTION
+    # Directly transform the whole image
     if transfer_option == 'whole':
         style = request.files['style_file']
-        style_name = secure_filename(style.filename)
-        style_path = os.path.join('static/style_images', style_name)
-
-        style.save(style_path)
         content = request.files['image_file']
-        content_name = secure_filename(content.filename)
-        content_path = os.path.join('static/input_images', content_name)
-        content.save(content_path)
+        STYLE_URL, CONTENT_URL = upload_style_content_images(style,content)
 
-        content_img_name = os.path.basename(content_path)[:-4]
-        style_img_name = os.path.basename(style_path)[:-4]
+        content_img_name = os.path.basename(CONTENT_URL)[:-4]
+        style_img_name = os.path.basename(STYLE_URL)[:-4]
         test = "arbitrary_image_stylization_with_weights \
         --checkpoint=arbitrary_style_transfer/model.ckpt \
-        --output_dir=static/out \
-        --style_images_paths="+style_path+"\
-        --content_images_paths="+content_path+"\
+        --output_dir=static/final \
+        --style_images_paths="+STYLE_URL+"\
+        --content_images_paths="+CONTENT_URL+"\
         --image_size=512 \
         --content_square_crop=False \
         --style_image_size=512 \
         --style_square_crop=False \
         --logtostderr"
         os.system(test)
-        path = 'static/out/'+('%s_stylized_%s_0.jpg' %
+        path = 'static/final/'+('%s_stylized_%s_0.jpg' %
                               (content_img_name, style_img_name))
         return render_template('upload.html', image_url=path)
+    # Transform the whole image with different weights of transfer
+    elif transfer_option == 'adjust':
+        style = request.files['style_file']
+        content = request.files['image_file']
+        STYLE_URL, CONTENT_URL = upload_style_content_images(style,content)
+
+        content_img_name = os.path.basename(CONTENT_URL)[:-4]
+        style_img_name = os.path.basename(STYLE_URL)[:-4]
+
+        INTERPOLATION_WEIGHTS='[0.2,0.4,0.6,0.8,1.0]'
+        output = "arbitrary_image_stylization_with_weights \
+        --checkpoint=arbitrary_style_transfer/model.ckpt \
+        --output_dir=static/final \
+        --style_images_paths="+STYLE_URL+"\
+        --content_images_paths="+CONTENT_URL+"\
+        --image_size=512 \
+        --content_square_crop=False \
+        --style_image_size=512 \
+        --style_square_crop=False \
+        --interpolation_weights="+INTERPOLATION_WEIGHTS+"\
+        --logtostderr"
+        os.system(output)
+        changed_paths = []
+        for i in range(5):
+            changed_paths.append('static/final/' + ('%s_stylized_%s_%d.jpg' %
+                                        (content_img_name, style_img_name,i)))  
+        return render_template('wholeOptions.html', image_url=changed_paths)
+    # Object Detection
     elif transfer_option == 'object':
-        # # Upload style image first
         SELECTION = 'object'
         style = request.files['style_file']
-        style_name = secure_filename(style.filename)
-        style_path = os.path.join('static/style_images', style_name)
-        style.save(style_path)
-        STYLE_URL = style_path
         content = request.files['image_file']
-        content_name = secure_filename(content.filename)
-        content_path = os.path.join('static/input_images', content_name)
-        content.save(content_path)
-        CONTENT_URL = content_path
+        STYLE_URL, CONTENT_URL = upload_style_content_images(style,content)
 
         RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
         return render_template('object.html', image_url=SHOW_OBJECTS)
+    # Inverse Object Detection
     elif transfer_option == 'inverse':
         SELECTION = 'inverse'
-        # # Upload style image first
         style = request.files['style_file']
-        style_name = secure_filename(style.filename)
-        style_path = os.path.join('static/style_images', style_name)
-        style.save(style_path)
-        STYLE_URL = style_path
         content = request.files['image_file']
-        content_name = secure_filename(content.filename)
-        content_path = os.path.join('static/input_images', content_name)
-        content.save(content_path)
-        CONTENT_URL = content_path
+        STYLE_URL, CONTENT_URL = upload_style_content_images(style,content)
 
         RESULTS, SHOW_OBJECTS = load_object(CONTENT_URL, detection_model)
         return render_template('object.html', image_url=SHOW_OBJECTS)
@@ -179,6 +157,7 @@ def upload():
 @app.route("/select", methods=['POST'])
 def select():
     global LOCATION
+    # Run different crop strategies according to selections
     selection = request.form.get('chosen_objects')
     selection = [int(x) for x in " ".join(selection.split(",")).split()]
     contour_outlines = show_selection_outlines(
@@ -186,18 +165,20 @@ def select():
     if SELECTION == 'object':
         location, background_image = show_selection_crop(
             selection, CONTENT_URL, RESULTS)
-        # global LOCATION
         LOCATION = location
     elif SELECTION == 'inverse':
-        location, background_image = show_selection_inverse(selection, CONTENT_URL, RESULTS)
+        location, background_image = show_selection_inverse(
+            selection, CONTENT_URL, RESULTS)
         LOCATION = location
     return render_template('crop.html', image_url=contour_outlines)
 
 @app.route("/transform", methods=['POST'])
 def transform():
+    # Transform object detection with options to adjust weights
     scale_option = request.form.get('scale')
     content_img_name = os.path.basename(LOCATION)[:-4]
     style_img_name = os.path.basename(STYLE_URL)[:-4]
+    # Direct Transformation 
     if scale_option == 'no':
         output = "arbitrary_image_stylization_with_weights \
             --checkpoint=arbitrary_style_transfer/model.ckpt \
@@ -214,6 +195,7 @@ def transform():
                                         (content_img_name, style_img_name))
         output_str = blending(LOCATION, CONTENT_URL, changed_path)
         return render_template('final.html', image_url=output_str)
+    # Transformation adjustable
     elif scale_option == 'yes':
         INTERPOLATION_WEIGHTS='[0.2,0.4,0.6,0.8,1.0]'
         outputs = "arbitrary_image_stylization_with_weights \
@@ -246,10 +228,6 @@ def blend():
     print(output_str_select)
     return render_template('final.html',image_url=output_str_select)
 
-
-@app.route("/download", methods=['GET'])
-def download():
-    return render_template('home.html')
 
 @app.errorhandler(500)
 def server_error(e):

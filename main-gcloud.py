@@ -4,7 +4,7 @@ import sys
 import time
 from flask import (Flask, flash, make_response, redirect, render_template,
                    request, send_file, session, url_for)
-from google.cloud import storage
+# from google.cloud import storage
 # from style_transfer import run_style_transfer
 from PIL import Image
 # from object_detection import load_object, show_selection, InferenceConfig

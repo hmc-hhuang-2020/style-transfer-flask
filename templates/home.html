@@ -15,18 +15,19 @@
   <div style="text-align:center">
     <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" id ='form1'>
       <div class="styleImageClass">
-        <p>Style Image: </p>
+        <p>Style Image:</p>
         <input class="input-file" name="style_file" type="file" accept="image/*">
       </div>
       <div class="inputImageClass">
-        <p>Input Image: </p>
+        <p>Input Image:</p>
         <input class="input-file" name="image_file" type="file" accept="image/*">
       </div>
       <div class="custom-select" style="width:275px;">
-        <p>Transfer Options: </p>
+        <p>Transfer Options:</p>
         <select name="transfer_select">
           <option value="">--Please choose an option--</option>
           <option value="whole">Whole Image</option>
+          <option value="adjust">Whole Image Adjustable</option>
           <option value="object">Detected Objects</option>
           <option value="inverse">Inverse Detected Objects</option>
         </select>

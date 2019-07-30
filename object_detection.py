@@ -1,51 +1,31 @@
 import os
 import sys
 
-# To find local version
-# ROOT_DIR = os.path.abspath("")
-# MaskRCNN_DIR = os.path.abspath("Mask_RCNN")
-# sys.path.append(os.path.join(MaskRCNN_DIR, "samples/coco/"))
-
-# sys.path.append(MaskRCNN_DIR)  # To find local version of the library
-# MODEL_DIR = os.path.join(MaskRCNN_DIR, "samples/coco/")
-# COCO_MODEL_PATH = os.path.join(MODEL_DIR, "mask_rcnn_coco.h5")
-
 from mrcnn import visualize
 import mrcnn.model as modellib
 from mrcnn import utils
-# from samples.coco import coco as coco
 import random
 import math
 import numpy as np
 import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
-
 import itertools
 import colorsys
-
 from skimage.measure import find_contours
 from skimage import measure
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
-# from mrcnn import model
 from PIL import Image
-
 import coco
-
 import tensorflow as tf
 import cv2
-
 import uuid
 
 
 class InferenceConfig(coco.CocoConfig):
-    # Set batch size to 1 since we'll be running inference on
-    # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
-
-
 
 class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'bus', 'train', 'truck', 'boat', 'traffic light',
@@ -63,17 +43,14 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
                'teddy bear', 'hair drier', 'toothbrush']
 
-
 def random_colors(N):
     hsv = [(i / N, 1, 1) for i in range(N)]
     colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
     random.shuffle(colors)
     return colors
 
-
 def apply_mask(image, mask, color, alpha=0.5):
-    """Apply the given mask to the image.
-    """
+    """Apply the given mask to the image."""
     for c in range(3):
         image[:, :, c] = np.where(mask == 1,
                                   image[:, :, c] *
@@ -81,19 +58,15 @@ def apply_mask(image, mask, color, alpha=0.5):
                                   image[:, :, c])
     return image
 
-
-def apply_mask_image(bg, image, mask,):
-    """Apply the given mask to the image.
-    """
+def apply_mask_image(bg, image, mask):
+    """Apply the given mask to the image."""
     for c in range(3):
         bg[:, :, c] = np.where(mask == 1,
                                image[:, :, c], bg[:, :, c],)
     return bg
 
-
-def apply_mask_inverse_image(bg, image, mask,):
-    """Apply the given mask to the image.
-    """
+def apply_mask_inverse_image(bg, image, mask):
+    """Apply the given mask to the image."""
     for c in range(3):
         image[:, :, c] = np.where(mask == 1,
                                   bg[:, :, c], image[:, :, c],)
@@ -101,6 +74,7 @@ def apply_mask_inverse_image(bg, image, mask,):
 
 
 def load_object(file_name, model):
+    """ Show all objects detected in the photo"""
     image = load_img(file_name)
     results = model.detect([image], verbose=1)
     r = results[0]
@@ -109,7 +83,6 @@ def load_object(file_name, model):
     figsize = (16, 16)
     _, ax = plt.subplots(1, figsize=figsize)
 
-    height, width = image.shape[:2]
     ax.axis('off')
     ax.margins(0, 0)
     captions = None
@@ -153,8 +126,8 @@ def load_object(file_name, model):
     return r, all
 
 
-# Contour Outline
 def show_selection_outlines(raw_input, image, r):
+    """Contour Outlines of selected objects"""
     image = skimage.io.imread(image)
     figsize = (16, 16)
     _, ax = plt.subplots(1, figsize=figsize)
@@ -184,8 +157,8 @@ def show_selection_outlines(raw_input, image, r):
     return outlines
 
 
-# Crop image according to selected contours
 def show_selection_crop(raw_input, image, r):
+    """Crop image according to selected contours"""
     image = skimage.io.imread(image)
     figsize = (16, 16)
     _, ax = plt.subplots(1, figsize=figsize)
@@ -209,10 +182,8 @@ def show_selection_crop(raw_input, image, r):
     plt.savefig(location, bbox_inches='tight', pad_inches=0)
     return location, background_image
 
-# Crop image according to selected inverse contours
-
-
 def show_selection_inverse(raw_input, image, r):
+    """Crop image according to selected inverse contours"""
     image = skimage.io.imread(image)
     figsize = (16, 16)
     _, ax = plt.subplots(1, figsize=figsize)
@@ -226,7 +197,6 @@ def show_selection_inverse(raw_input, image, r):
     for i in raw_input:
         if i > len(r['rois']) or i < 0:
             continue
-        y1, x1, y2, x2 = r['rois'][i]
         mask = r['masks'][:, :, i]
         masked_image = apply_mask_inverse_image(
             background_image, masked_image, mask,)
@@ -240,15 +210,16 @@ def show_selection_inverse(raw_input, image, r):
 
 
 def load_img(path_to_img):
+    """Load image using skimage"""
     img = skimage.io.imread(path_to_img)
     return img
 
 
 def blending(crop_path, original_path, style_path):
+    """Blending technique using GaussianBlur"""
     styled = cv2.imread(style_path).astype('uint8')
     crop = cv2.imread(crop_path).astype('uint8')
     original = cv2.imread(original_path).astype('uint8')
-    # styled = cv2.resize(styled, (original.shape[1], original.shape[0]))
     crop = cv2.resize(crop, (styled.shape[1], styled.shape[0]))
     original = cv2.resize(original, (styled.shape[1], styled.shape[0]))
 
