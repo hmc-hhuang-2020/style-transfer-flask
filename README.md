@@ -30,6 +30,6 @@ In order to host and run the web application, follow these steps:
 5. Choose whether to apply the style transfer to:  
    - the whole image 
    - the whole image with adjustable style weights
-   - to selected objects
+   - selected objects
    - inverse of the selected objects.
 6. In the case of the third and forth options, pick objects by inputing a comma or space separated list of numbers. Each number corresponds to the label number appeared at th beginning of the detected captions. Enter 1000 to select all detected objects. 
