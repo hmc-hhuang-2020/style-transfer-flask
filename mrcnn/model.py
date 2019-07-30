@@ -47,7 +47,7 @@ def log(text, array=None):
         else:
             text += ("min: {:10}  max: {:10}".format("",""))
         text += "  {}".format(array.dtype)
-    print(text)
+    # print(text)
 
 
 class BatchNorm(KL.BatchNormalization):
@@ -2439,9 +2439,7 @@ class MaskRCNN():
         zero_ix = np.where(detections[:, 4] == 0)[0]
         # zero_ix = tf.where(detections[:, 4] == 0)[0]
         N = zero_ix[0]
-        # print(zero_ix[])
         # N = zero_ix[0] if zero_ix.shape[0] > 0 else detections.shape[0]
-        # N = int(N)
         # Extract boxes, class_ids, scores, and class-specific masks
         boxes = detections[:N, :4]
         class_ids = detections[:N, 4].astype(np.int32)
