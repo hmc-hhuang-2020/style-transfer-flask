@@ -35,10 +35,10 @@ In order to host and run the web application on local machines, follow these ste
 6. In the case of the third and forth options, pick objects by inputing a comma or space separated list of numbers. Each number corresponds to the label number appeared at th beginning of the detected captions. Enter 1000 to select all detected objects. 
 
 ## Demo Video
-* [Whole Functionality Demo](https://drive.google.com/open?id=13jspDAK66PTK-jTiIQ1ck7dFXJUAO8i4)
-* [Single Style Transfer Demo](https://drive.google.com/file/d/1FoMLvk-yN2U07wJ-w5DYDVdNS3fdmOdN/view?usp=sharing)
-* [Object Detection with Style Transfer Demo](https://drive.google.com/file/d/1id1w0Fs03p8N4_9hPUh3JLOWnqF_yyDQ/view?usp=sharing)
-* [Inverse Object Detection with Style Transfer Demo](https://drive.google.com/file/d/1pI6nU-ROYsez_FA5tLH0XG1CMx54rsYh/view?usp=sharing)
+* [Whole Functionality](https://drive.google.com/open?id=13jspDAK66PTK-jTiIQ1ck7dFXJUAO8i4)
+* [Single Style Transfer](https://drive.google.com/file/d/1FoMLvk-yN2U07wJ-w5DYDVdNS3fdmOdN/view?usp=sharing)
+* [Object Detection with Style Transfer](https://drive.google.com/file/d/1id1w0Fs03p8N4_9hPUh3JLOWnqF_yyDQ/view?usp=sharing)
+* [Inverse Object Detection with Style Transfer](https://drive.google.com/file/d/1pI6nU-ROYsez_FA5tLH0XG1CMx54rsYh/view?usp=sharing)
 
 ## Resources
 * [Magenta](https://github.com/tensorflow/magenta)
