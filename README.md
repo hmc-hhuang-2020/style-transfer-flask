@@ -6,16 +6,20 @@ Localized Style Transfer is an application that performs style transfer while al
 
 In order to host and run the web application, follow these steps:
 1. Clone the repository.
-2. Install `libasound2-dev`: `sudo apt-get install libasound2-dev`
+2. For Ubuntu, install `libasound2-dev`: `sudo apt-get install libasound2-dev`
 3. Create a virtual environment to install dependencies: `python3 -m venv path/to/my_venv`
-4. Install dependencies from `requirements.txt`: `pip install -r requirements.txt`
+4. Activate the virtual enviroment created: `source activate` 
+5. Install dependencies from `requirements.txt`: `pip install -r requirements.txt`
 
 ## Usage
 
 1. Run the web application using the command `python main.py`
-2. Select a style image and content image.
-3. Choose whether to apply the style transfer to:  
+2. The script will download mask_rcnn_coco.h5 for object detection model and arbitrary_style_transfer folder for style transfer model.
+3. Open a web browser and enter the address `localhost:5000` or the address appeared on the running on `address` line.
+4. Select a style image and a content image.
+5. Choose whether to apply the style transfer to:  
    - the whole image 
+   - the whole image with adjustable style weights
    - to selected objects
    - inverse of the selected objects.
-4. In the case of the second and third options, pick objects by inputing a comma separated list of numbers.
+6. In the case of the third and forth options, pick objects by inputing a comma or space separated list of numbers. Each number corresponds to the label number appeared at th beginning of the detected captions. Enter 1000 to select all detected objects. 
