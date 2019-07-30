@@ -38,7 +38,7 @@ In order to host and run the web application on local machines, follow these ste
 * [Whole Functionality Demo](https://drive.google.com/open?id=13jspDAK66PTK-jTiIQ1ck7dFXJUAO8i4)
 * [Single Style Transfer Demo](https://drive.google.com/file/d/1FoMLvk-yN2U07wJ-w5DYDVdNS3fdmOdN/view?usp=sharing)
 * [Object Detection with Style Transfer Demo](https://drive.google.com/file/d/1id1w0Fs03p8N4_9hPUh3JLOWnqF_yyDQ/view?usp=sharing)
-* [Inverse Object Detection wit Style Transfer Demo](https://drive.google.com/file/d/1pI6nU-ROYsez_FA5tLH0XG1CMx54rsYh/view?usp=sharing)
+* [Inverse Object Detection with Style Transfer Demo](https://drive.google.com/file/d/1pI6nU-ROYsez_FA5tLH0XG1CMx54rsYh/view?usp=sharing)
 
 ## Resources
 * [Magenta](https://github.com/tensorflow/magenta)
