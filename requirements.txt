@@ -37,4 +37,3 @@ GoogleAppEngineCloudStorageClient
 ez_setup
 webapp2
 cython
-git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI
