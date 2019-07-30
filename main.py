@@ -73,7 +73,6 @@ def upload_style_content_images(style,content):
 def index():
     return render_template('home.html')
 
-
 @app.route('/about')
 def about():
     return render_template('about.html')
