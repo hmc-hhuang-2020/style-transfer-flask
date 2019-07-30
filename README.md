@@ -25,7 +25,7 @@ In order to host and run the web application on local machines, follow these ste
 
 1. Activate virtual environment and run the web application using the command `python main.py`
 2. The script will automatically download mask_rcnn_coco.h5 file for the object detection model and arbitrary_style_transfer folder for the style transfer model.
-3. Open a web browser and enter the address `localhost:5000` or `https://http://127.0.0.1:5000`
+3. Open a web browser and enter the address `localhost:5000` or `http://127.0.0.1:5000`
 4. Select a style image and a content image.
 5. Choose whether to apply the style transfer to:  
    - the whole image 
