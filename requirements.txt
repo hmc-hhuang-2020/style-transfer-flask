@@ -37,3 +37,4 @@ GoogleAppEngineCloudStorageClient
 ez_setup
 webapp2
 cython
+imgaug
