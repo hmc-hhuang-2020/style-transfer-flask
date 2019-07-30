@@ -1,6 +1,6 @@
 # Localized Style Transfer
 
-Localized Style Transfer is an application that performs style transfer while allowing the user control over which portion of the image the style transfer gets applied to. The user provides two images: a **style image** to emulate and a **content image** to apply the style to. The application provides the user with a list of objects detected to create a mask and control where the style transfer gets applied to, leaving the rest of the image intact.
+Localized Style Transfer is an application that performs style transfer while allowing the user control over which portion of the image the style transfer gets applied to. The user provides two images: a **style image** to emulate and a **content image** to apply the style to. The Flask web application provides the user with a list of objects detected to create a mask and control where the style transfer gets applied to, leaving the rest of the image intact.
 
 ## Installation
 
@@ -33,3 +33,10 @@ In order to host and run the web application, follow these steps:
    - selected objects
    - inverse of the selected objects.
 6. In the case of the third and forth options, pick objects by inputing a comma or space separated list of numbers. Each number corresponds to the label number appeared at th beginning of the detected captions. Enter 1000 to select all detected objects. 
+
+## Demo Video
+* [Whole Functionality Demo](https://drive.google.com/file/d/1tLlLgQZDAoCzGuWS2bbrsWkhSEhGT-vX/view?usp=sharing)
+
+## Resources
+* [Magenta](https://github.com/tensorflow/magenta)
+* [Mask R-CNN](https://github.com/matterport/Mask_RCNN)
