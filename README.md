@@ -41,6 +41,13 @@ In order to host and run the web application on local machines, follow these ste
 * [Object Detection with Style Transfer](https://drive.google.com/file/d/1id1w0Fs03p8N4_9hPUh3JLOWnqF_yyDQ/view?usp=sharing)
 * [Inverse Object Detection with Style Transfer](https://drive.google.com/file/d/1pI6nU-ROYsez_FA5tLH0XG1CMx54rsYh/view?usp=sharing)
 
+## Team
+- [Huize Huang](https://www.linkedin.com/in/huize-huang-868a46158/) 
+- [Aaron Alphonsus](https://www.linkedin.com/in/aaron-alphonsus/)
+- [Michael Hu](https://www.linkedin.com/in/michael-lejeune-hu-33a4b921/)
+- [Luis Gruber](https://www.linkedin.com/in/luis-gruber2609/)
+- [Sarah Saleem](https://www.linkedin.com/in/sarah-saleem/)
+
 ## Resources
 * [Magenta](https://github.com/tensorflow/magenta)
 * [Mask R-CNN](https://github.com/matterport/Mask_RCNN)
